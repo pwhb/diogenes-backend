@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { QuickRegisterAuthDto } from './dto/quick-register-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Auth } from './auth.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, ObjectId } from 'mongoose';
 
 @Injectable()
 export class AuthService {
-  create(quickRegisterAuthDto: QuickRegisterAuthDto) {
+  constructor(
+    @InjectModel(Auth.name) private readonly authModel: Model<Auth>,
+  ) {}
+  create(userId: ObjectId) {
     return 'This action adds a new auth';
   }
 

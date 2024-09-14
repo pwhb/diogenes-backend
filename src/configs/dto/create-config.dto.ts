@@ -1,19 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsNotEmpty, IsOptional } from 'class-validator';
-
-export enum ConfigType {
-  STRING = 'STRING',
-  BOOLEAN = 'BOOLEAN',
-  OBJECT = 'OBJECT',
-  NUMBER = 'NUMBER',
-}
-
-export type TConfig = {
-  code: string;
-  name: string;
-  value: any;
-  type: ConfigType;
-};
+import { TConfig } from '../configs.schema';
 
 export class CreateConfigDto {
   @ApiProperty()

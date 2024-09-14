@@ -1,7 +1,20 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import { Base } from 'src/common/schema/base.schema';
-import { ConfigType, TConfig } from './dto/create-config.dto';
+
+export enum ConfigType {
+  STRING = 'STRING',
+  BOOLEAN = 'BOOLEAN',
+  OBJECT = 'OBJECT',
+  NUMBER = 'NUMBER',
+}
+
+export type TConfig = {
+  code: string;
+  name: string;
+  value: any;
+  type: ConfigType;
+};
 
 export type ConfigDocument = HydratedDocument<Config>;
 @Schema()

@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ConfigsService } from './configs.service';
 import { CreateConfigDto } from './dto/create-config.dto';
 import { UpdateConfigDto } from './dto/update-config.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { QueryConfigDto } from './dto/query-config.dto';
 
 @ApiTags('configs')
 @Controller('api/v1/configs')
@@ -23,8 +25,8 @@ export class ConfigsController {
   }
 
   @Get()
-  findAll() {
-    return this.configsService.findAll();
+  findAll(@Query() query: QueryConfigDto) {
+    return this.configsService.findAll(query);
   }
 
   @Get(':id')
