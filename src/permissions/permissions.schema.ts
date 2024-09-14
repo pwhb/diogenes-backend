@@ -5,8 +5,8 @@ import { Base } from 'src/common/schema/base.schema';
 export type PermissionDocument = HydratedDocument<Permission>;
 @Schema()
 export class Permission extends Base {
-    @Prop({ required: true, unique: true })
-    name: string;
+  @Prop({ required: true, unique: true })
+  name: string;
 }
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);

@@ -4,18 +4,18 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './roles.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import STRINGS from 'src/config/strings';
+import STRINGS from 'src/common/consts/strings.json';
 import { query } from 'express';
 import { parseQuery, QueryType } from 'src/common/db/query';
 
 @Injectable()
 export class RolesService {
-  constructor(@InjectModel(Role.name) private roleModel: Model<Role>) { }
+  constructor(@InjectModel(Role.name) private roleModel: Model<Role>) {}
   async create(createRoleDto: CreateRoleDto) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.create(createRoleDto)
-    }
+      data: await this.roleModel.create(createRoleDto),
+    };
   }
   async findAll() {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
@@ -42,21 +42,21 @@ export class RolesService {
   async findOne(id: string) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.findById(id)
-    }
+      data: await this.roleModel.findById(id),
+    };
   }
 
   async update(id: string, updateRoleDto: UpdateRoleDto) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.findByIdAndUpdate(id, updateRoleDto).lean()
+      data: await this.roleModel.findByIdAndUpdate(id, updateRoleDto).lean(),
     };
   }
 
   async remove(id: string) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.findByIdAndDelete(id).lean()
+      data: await this.roleModel.findByIdAndDelete(id).lean(),
     };
   }
 }
