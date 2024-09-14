@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import ENV from './config/env';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,7 +19,7 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document, {
     jsonDocumentUrl: 'docs/swagger.json'
   });
-
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(configService.get('PORT'));
 }
 bootstrap();
