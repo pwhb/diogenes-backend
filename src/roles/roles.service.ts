@@ -9,18 +9,15 @@ import { parseQuery, QueryType } from 'src/common/db/query';
 import { QueryRoleDto } from './dto/query-role.dto';
 
 @Injectable()
-export class RolesService
-{
-  constructor(@InjectModel(Role.name) private rolModel: Model<Role>) { }
-  async create(dto: CreateRoleDto)
-  {
+export class RolesService {
+  constructor(@InjectModel(Role.name) private rolModel: Model<Role>) {}
+  async create(dto: CreateRoleDto) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
       data: await this.rolModel.create(dto),
     };
   }
-  async findAll(query: QueryRoleDto)
-  {
+  async findAll(query: QueryRoleDto) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -42,16 +39,14 @@ export class RolesService
     };
   }
 
-  async findOne(id: string)
-  {
+  async findOne(id: string) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
       data: await this.rolModel.findById(id),
     };
   }
 
-  async update(id: string, updateRoleDto: UpdateRoleDto)
-  {
+  async update(id: string, updateRoleDto: UpdateRoleDto) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
       data: await this.rolModel
@@ -60,8 +55,7 @@ export class RolesService
     };
   }
 
-  async remove(id: string)
-  {
+  async remove(id: string) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
       data: await this.rolModel.findByIdAndDelete(id).lean(),

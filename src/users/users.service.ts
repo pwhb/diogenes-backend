@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.schema';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import STRINGS from 'src/common/consts/strings.json';
 import { parseQuery, QueryType } from 'src/common/db/query';
@@ -18,7 +18,7 @@ export class UsersService {
   }
 
   findUser(filter: FilterQuery<User>) {
-    return this.userModel.findOne(filter);
+    return this.userModel.findOne(filter).lean();
   }
 
   async findAll(query: QueryUserDto) {

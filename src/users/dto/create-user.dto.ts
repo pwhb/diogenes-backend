@@ -9,4 +9,8 @@ export class CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   deviceId: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  roleId: string;
 }

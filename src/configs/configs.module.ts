@@ -8,6 +8,7 @@ import { Config, ConfigSchema } from './configs.schema';
   imports: [
     MongooseModule.forFeature([{ name: Config.name, schema: ConfigSchema }]),
   ],
+  exports: [ConfigsService],
   controllers: [ConfigsController],
   providers: [ConfigsService],
 })

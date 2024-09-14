@@ -1,5 +1,4 @@
-import
-{
+import {
   Controller,
   Get,
   Post,
@@ -17,37 +16,31 @@ import { QueryRoleDto } from './dto/query-role.dto';
 
 @ApiTags('roles')
 @Controller('api/v1/roles')
-export class RolesController
-{
-  constructor(private readonly rolesService: RolesService) { }
+export class RolesController {
+  constructor(private readonly rolesService: RolesService) {}
 
   @Post()
-  create(@Body() createRoleDto: CreateRoleDto)
-  {
+  create(@Body() createRoleDto: CreateRoleDto) {
     return this.rolesService.create(createRoleDto);
   }
 
   @Get()
-  findAll(@Query() query: QueryRoleDto)
-  {
+  findAll(@Query() query: QueryRoleDto) {
     return this.rolesService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string)
-  {
+  findOne(@Param('id') id: string) {
     return this.rolesService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto)
-  {
+  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
     return this.rolesService.update(id, updateRoleDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string)
-  {
+  remove(@Param('id') id: string) {
     return this.rolesService.remove(id);
   }
 }

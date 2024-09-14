@@ -15,5 +15,6 @@
     "JWT_MALFORMED": "jwt malformed",
     "TOKENEXPIREDERROR": "TokenExpiredError",
     "JSONWEBTOKENERROR": "JsonWebTokenError"
-  }
+  },
+  "USER_VALIDATION_FAILED_ROLEIDTYPE_PATH_ROLEIDTYPE_IS_REQUIRED": "User validation failed: roleId.type: Path `roleId.type` is required."
 }

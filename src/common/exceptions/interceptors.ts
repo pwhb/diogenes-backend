@@ -22,7 +22,7 @@ export function updateConsts(message: string) {
       [stringToCONST(message)]: message,
     };
     fs.writeFileSync(
-      'src/lib/consts/strings.json',
+      'src/common/consts/strings.json',
       JSON.stringify(update, null, 2),
     );
   }
