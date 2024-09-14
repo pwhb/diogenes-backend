@@ -5,8 +5,8 @@ import { Base } from 'src/common/schema/base.schema';
 export type MenuDocument = HydratedDocument<Menu>;
 @Schema()
 export class Menu extends Base {
-    @Prop({ required: true, unique: true })
-    name: string;
+  @Prop({ required: true, unique: true })
+  name: string;
 }
 
 export const MenuSchema = SchemaFactory.createForClass(Menu);

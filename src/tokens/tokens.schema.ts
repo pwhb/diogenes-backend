@@ -5,20 +5,20 @@ import { Base } from 'src/common/schema/base.schema';
 export type TokenDocument = HydratedDocument<Token>;
 @Schema()
 export class Token extends Base {
-    @Prop()
-    deviceId: string;
+  @Prop()
+  deviceId: string;
 
-    @Prop()
-    token: string;
+  @Prop()
+  token: string;
 
-    @Prop({ type: Types.ObjectId, ref: 'User' })
-    userId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'User' })
+  userId: Types.ObjectId;
 
-    @Prop({ type: Date })
-    expiredAt: Date;
+  @Prop({ type: Date })
+  expiredAt: Date;
 
-    @Prop()
-    rememberMe: boolean;
+  @Prop()
+  rememberMe: boolean;
 }
 
 export const TokenSchema = SchemaFactory.createForClass(Token);

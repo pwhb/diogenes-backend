@@ -12,13 +12,14 @@ import { ConfigsModule } from './configs/configs.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { MenusModule } from './menus/menus.module';
 import { TokensModule } from './tokens/tokens.module';
-
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register(),
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [configuration]
+      load: [configuration],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -33,9 +34,9 @@ import { TokensModule } from './tokens/tokens.module';
     ConfigsModule,
     PermissionsModule,
     MenusModule,
-    TokensModule
+    TokensModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
