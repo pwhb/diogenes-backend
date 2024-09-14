@@ -49,7 +49,9 @@ export class RolesService {
   async update(id: string, updateRoleDto: UpdateRoleDto) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.findByIdAndUpdate(id, updateRoleDto).lean(),
+      data: await this.roleModel
+        .findByIdAndUpdate(id, updateRoleDto, { returnDocument: 'after' })
+        .lean(),
     };
   }
 
