@@ -13,6 +13,9 @@ export class Permission extends Base {
 
   @Prop({ required: true })
   method: string;
+
+  @Prop({ default: ['root'], type: [String] })
+  allowedRoles: string[];
 }
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);

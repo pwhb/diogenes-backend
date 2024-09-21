@@ -46,6 +46,24 @@ export class PermissionsService {
     return created._id;
   }
 
+  async checkPermission(query: { path: string; method: string }, role: any) {
+    let allowedRoles = ['root'];
+    if (allowedRoles.includes(role.name)) return true;
+
+    const found = await this.permissionModel.findOne(query).lean();
+    if (found) {
+      allowedRoles = found.allowedRoles;
+      if (
+        allowedRoles.includes(role.name) ||
+        allowedRoles.includes('public') ||
+        role.permissionsIds.includes(found._id.toString())
+      )
+        return true;
+    }
+    await this.createPermission(query);
+    return false;
+  }
+
   async findAll(query: QueryPermissionDto) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {

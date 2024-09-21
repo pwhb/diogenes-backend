@@ -16,6 +16,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { TemplatesModule } from './templates/templates.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard, RoleGuard } from './auth/auth.guard';
+import { HomeModule } from './home/home.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AuthGuard, RoleGuard } from './auth/auth.guard';
     MenusModule,
     TokensModule,
     TemplatesModule,
+    HomeModule,
   ],
   controllers: [AppController],
   providers: [

@@ -9,9 +9,7 @@ import { Request } from 'express';
 import { TokensService } from 'src/tokens/tokens.service';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AuthService } from './auth.service';
 import { PermissionsService } from 'src/permissions/permissions.service';
-import { ObjectId } from 'mongoose';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { UsersService } from 'src/users/users.service';
 
@@ -77,16 +75,14 @@ export class RoleGuard implements CanActivate {
     if (request.user) {
       const { method, params, path } = request;
       const parsed = this.parseUrl(path, params);
-      const permId = await this.permissionsService.getPermissionId({
-        path: parsed,
-        method,
-      });
-      const permissionsIds = request.user.role.permissionsIds.map(
-        (v: ObjectId[]) => v.toString(),
+      const allowed = await this.permissionsService.checkPermission(
+        { path: parsed, method: method },
+        request.user.role,
       );
-      if (permissionsIds.includes(permId.toString())) {
-        return true;
-      }
+      request.user.role = {
+        name: request.user.role.name,
+      };
+      return allowed;
     }
     return false;
   }

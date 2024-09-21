@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { QuickRegisterAuthDto } from './dto/quick-register-auth.dto';
 import { UsersService } from 'src/users/users.service';
 import { generateUsername } from 'src/common/helpers/generators';
 import { ConfigsService } from 'src/configs/configs.service';
 import STRINGS from 'src/common/consts/strings.json';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { TokensService } from 'src/tokens/tokens.service';
@@ -19,6 +19,14 @@ export class AuthController {
     private readonly configsService: ConfigsService,
     private readonly tokensService: TokensService,
   ) {}
+
+  @Get('me')
+  me(@Req() req: Request, @Res() res: Response) {
+    return res.status(200).json({
+      message: STRINGS.RESPONSES.SUCCESS,
+      data: req['user'],
+    });
+  }
 
   @Public()
   @Post('quick-register')
@@ -127,10 +135,5 @@ export class AuthController {
         },
       },
     });
-  }
-
-  @Get('me')
-  me() {
-    return 'me';
   }
 }

@@ -8,17 +8,17 @@ export class QueryRoleDto extends PartialType(
 ) {
   @ApiProperty({ required: false })
   @IsOptional()
-  q: string;
+  q?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  page: number;
+  page?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  size: number;
+  size?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  sort_by: string;
+  sort_by?: string;
 }

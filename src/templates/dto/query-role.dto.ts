@@ -8,17 +8,21 @@ export class QueryTemplateDto extends PartialType(
 ) {
   @ApiProperty({ required: false })
   @IsOptional()
-  q: string;
+  type: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  page: number;
+  q?: string;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  size: number;
+  page?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  sort_by: string;
+  size?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  sort_by?: string;
 }
