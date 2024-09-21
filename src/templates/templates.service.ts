@@ -1,23 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
-import { Role } from './roles.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import STRINGS from 'src/common/consts/strings.json';
 import { parseQuery, QueryType } from 'src/common/db/query';
-import { QueryRoleDto } from './dto/query-role.dto';
+import { Template } from './templates.schema';
+import { CreateTemplateDto } from './dto/create-template.dto';
+import { UpdateTemplateDto } from './dto/update-template.dto';
+import { QueryTemplateDto } from './dto/query-role.dto';
 
 @Injectable()
-export class RolesService {
-  constructor(@InjectModel(Role.name) private roleModel: Model<Role>) {}
-  async create(dto: CreateRoleDto) {
+export class TemplatesService {
+  constructor(
+    @InjectModel(Template.name) private templateModel: Model<Template>,
+  ) {}
+  async create(dto: CreateTemplateDto) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.create(dto),
+      data: await this.templateModel.create(dto),
     };
   }
-  async findAll(query: QueryRoleDto) {
+  async findAll(query: QueryTemplateDto) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -26,10 +28,10 @@ export class RolesService {
       },
     ]);
 
-    const docs = await this.roleModel
+    const docs = await this.templateModel
       .find(filter, {}, { skip, limit, sort })
       .lean();
-    const count = await this.roleModel.countDocuments(filter);
+    const count = await this.templateModel.countDocuments(filter);
     return {
       message: STRINGS.RESPONSES.SUCCESS,
       page,
@@ -42,14 +44,14 @@ export class RolesService {
   async findOne(id: string) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.findById(id),
+      data: await this.templateModel.findById(id),
     };
   }
 
-  async update(id: string, updateRoleDto: UpdateRoleDto) {
+  async update(id: string, updateRoleDto: UpdateTemplateDto) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel
+      data: await this.templateModel
         .findByIdAndUpdate(id, updateRoleDto, { returnDocument: 'after' })
         .lean(),
     };
@@ -58,7 +60,7 @@ export class RolesService {
   async remove(id: string) {
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.findByIdAndDelete(id).lean(),
+      data: await this.templateModel.findByIdAndDelete(id).lean(),
     };
   }
 }

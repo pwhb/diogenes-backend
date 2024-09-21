@@ -13,6 +13,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { MenusModule } from './menus/menus.module';
 import { TokensModule } from './tokens/tokens.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { TemplatesModule } from './templates/templates.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     PermissionsModule,
     MenusModule,
     TokensModule,
+    TemplatesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
