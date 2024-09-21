@@ -9,6 +9,7 @@ import { Response } from 'express';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { TokensService } from 'src/tokens/tokens.service';
+import { Public } from './auth.guard';
 
 @Controller('api/v1/auth')
 export class AuthController {
@@ -19,6 +20,7 @@ export class AuthController {
     private readonly tokensService: TokensService,
   ) {}
 
+  @Public()
   @Post('quick-register')
   async quickRegister(@Body() dto: QuickRegisterAuthDto, @Res() res: Response) {
     const USER_ROLE = await this.configsService.get('USER_ROLE');
@@ -57,6 +59,7 @@ export class AuthController {
     });
   }
 
+  @Public()
   @Post('register')
   async register(@Body() dto: RegisterAuthDto, @Res() res: Response) {
     const USER_ROLE = await this.configsService.get('USER_ROLE');
@@ -92,6 +95,7 @@ export class AuthController {
     });
   }
 
+  @Public()
   @Post('login')
   async login(@Body() dto: LoginAuthDto, @Res() res: Response) {
     const user = await this.usersService.findUser({ username: dto.username });

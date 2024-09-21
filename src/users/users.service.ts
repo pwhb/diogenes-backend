@@ -21,6 +21,10 @@ export class UsersService {
     return this.userModel.findOne(filter).populate('role', 'name').lean();
   }
 
+  findUserById(userId: string) {
+    return this.userModel.findById(userId).populate('role').lean();
+  }
+
   async findAll(query: QueryUserDto) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {

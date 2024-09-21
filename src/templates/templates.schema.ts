@@ -13,10 +13,13 @@ export class Template extends Base {
   name: LangString;
 
   @Prop({ required: true, unique: true })
-  code: string;
+  slug: string;
 
   @Prop({ required: true })
   type: string;
+
+  @Prop({ required: true, default: 'inactive' })
+  status: string;
 
   @Prop({ type: Object })
   config: {
@@ -32,7 +35,7 @@ export class Template extends Base {
     rules?: LangString;
     messageTemplate?: LangString;
     gameModes?: string[];
-    playerOptions?: string[];
+    playersOptions?: string[];
   };
 }
 
