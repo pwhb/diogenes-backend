@@ -17,7 +17,7 @@ export type TConfig = {
 };
 
 export type ConfigDocument = HydratedDocument<Config>;
-@Schema()
+@Schema({ timestamps: true })
 export class Config extends Base {
   @Prop({ required: true, unique: true })
   code: string;

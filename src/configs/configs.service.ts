@@ -1,4 +1,4 @@
-import { Global, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -19,12 +19,12 @@ export class ConfigsService {
   async get(code: string): Promise<any> {
     const result = await this.cacheManager.get(code);
     if (result) {
-      // console.log('FROM CACHE', code);
+      console.log('FROM CACHE', code);
       return result;
     }
     const resultFromDB = await this.configModel.findOne({ code }).lean();
     if (resultFromDB) {
-      // console.log('FROM DB', code);
+      console.log('FROM DB', code);
       await this.cacheManager.set(code, resultFromDB, 0);
       return resultFromDB;
     }
@@ -67,11 +67,13 @@ export class ConfigsService {
   }
 
   async update(id: string, updateConfigDto: UpdateConfigDto) {
+    const data = await this.configModel
+      .findByIdAndUpdate(id, updateConfigDto, { returnDocument: 'after' })
+      .lean();
+    await this.cacheManager.del(data.code);
     return {
       message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.configModel
-        .findByIdAndUpdate(id, updateConfigDto, { returnDocument: 'after' })
-        .lean(),
+      data: data,
     };
   }
 

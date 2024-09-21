@@ -3,7 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { Base } from 'src/common/schema/base.schema';
 
 export type TokenDocument = HydratedDocument<Token>;
-@Schema()
+@Schema({ timestamps: true })
 export class Token extends Base {
   @Prop()
   deviceId: string;

@@ -13,12 +13,12 @@ export class UsersService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.userModel.create(createUserDto);
+  create(dto: User) {
+    return this.userModel.create(dto);
   }
 
   findUser(filter: FilterQuery<User>) {
-    return this.userModel.findOne(filter).lean();
+    return this.userModel.findOne(filter).populate('role', 'name').lean();
   }
 
   async findAll(query: QueryUserDto) {

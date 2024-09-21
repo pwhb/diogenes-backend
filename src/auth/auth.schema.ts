@@ -1,17 +1,15 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Base } from 'src/common/schema/base.schema';
 import { User } from 'src/users/users.schema';
 
 export type AuthDocument = HydratedDocument<Auth>;
-@Schema()
+@Schema({ timestamps: true })
 export class Auth extends Base {
-  @Prop({
-    type: { type: mongoose.Schema.Types.ObjectId, ref: User.name },
-  })
-  userId: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: User.name, unique: true })
+  userId: Types.ObjectId;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   password: string;
 }
 

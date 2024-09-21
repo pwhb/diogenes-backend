@@ -5,7 +5,7 @@ import { Menu } from 'src/menus/menus.schema';
 import { Permission } from 'src/permissions/permissions.schema';
 
 export type RoleDocument = HydratedDocument<Role>;
-@Schema()
+@Schema({ timestamps: true })
 export class Role extends Base {
   @Prop({ required: true, unique: true })
   name: string;

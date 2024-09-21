@@ -2,30 +2,37 @@ import { Injectable } from '@nestjs/common';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { Auth } from './auth.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
+import { Model, Types } from 'mongoose';
+import { hash, verify } from 'argon2';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(Auth.name) private readonly authModel: Model<Auth>,
   ) {}
-  create(userId: ObjectId) {
-    return 'This action adds a new auth';
+  async create({
+    userId,
+    password,
+  }: {
+    userId: Types.ObjectId;
+    password: string;
+  }) {
+    console.log(userId, password);
+
+    return this.authModel.create({
+      userId: userId,
+      password: await hash(password),
+    });
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async verify({
+    userId,
+    password,
+  }: {
+    userId: Types.ObjectId;
+    password: string;
+  }) {
+    const auth = await this.authModel.findOne({ userId: userId }).lean();
+    return await verify(auth.password, password);
   }
 }

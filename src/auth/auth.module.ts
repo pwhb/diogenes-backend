@@ -5,12 +5,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Auth, AuthSchema } from './auth.schema';
 import { UsersModule } from 'src/users/users.module';
 import { ConfigsModule } from 'src/configs/configs.module';
+import { TokensModule } from 'src/tokens/tokens.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Auth.name, schema: AuthSchema }]),
     ConfigsModule,
     UsersModule,
+    TokensModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

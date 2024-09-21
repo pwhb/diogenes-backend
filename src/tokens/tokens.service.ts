@@ -8,12 +8,14 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginAuthDto } from 'src/auth/dto/login-auth.dto';
 import STRINGS from 'src/common/consts/strings.json';
 import { Token } from './tokens.schema';
+import { ConfigsService } from 'src/configs/configs.service';
 
 @Injectable()
 export class TokensService {
   constructor(
     @InjectModel(Token.name) private readonly tokenModel: Model<Token>,
     private readonly jwtService: JwtService,
+    private readonly configsService: ConfigsService,
   ) {}
 
   async signin(userId: Types.ObjectId, loginAuthDto: LoginAuthDto) {
@@ -42,12 +44,19 @@ export class TokensService {
     deviceId: string,
     rememberMe: boolean = false,
   ) {
+    const AUTH = await this.configsService.get('AUTH');
+    const duration = rememberMe
+      ? AUTH.value['LongRefreshTokenExpirationInDay']
+      : AUTH.value['RefreshTokenExpirationInDay'];
+
+    console.log('duration', duration);
+
     return await this.tokenModel
       .findOneAndUpdate(
         { userId: userId, deviceId: deviceId },
         {
           token: uuidv4(),
-          expiredAt: dayjs().add(rememberMe ? 7 : 3, 'day'),
+          expiredAt: dayjs().add(duration, 'day'),
           updatedAt: dayjs(),
           rememberMe,
         },
