@@ -40,9 +40,10 @@ export class RolesService {
   }
 
   async findOne(id: string) {
+    const data = await this.roleModel.findById(id).lean();
     return {
-      message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.roleModel.findById(id),
+      message: data ? STRINGS.RESPONSES.SUCCESS : STRINGS.RESPONSES.NOT_FOUND,
+      data: data,
     };
   }
 

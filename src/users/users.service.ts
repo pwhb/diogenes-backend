@@ -44,9 +44,10 @@ export class UsersService {
   }
 
   async findOne(id: string) {
+    const data = await this.userModel.findById(id).lean();
     return {
-      message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.userModel.findById(id),
+      message: data ? STRINGS.RESPONSES.SUCCESS : STRINGS.RESPONSES.NOT_FOUND,
+      data: data,
     };
   }
 

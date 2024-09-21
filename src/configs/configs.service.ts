@@ -60,9 +60,10 @@ export class ConfigsService {
   }
 
   async findOne(id: string) {
+    const data = await this.configModel.findById(id).lean();
     return {
-      message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.configModel.findById(id),
+      message: data ? STRINGS.RESPONSES.SUCCESS : STRINGS.RESPONSES.NOT_FOUND,
+      data: data,
     };
   }
 

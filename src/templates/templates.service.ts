@@ -42,9 +42,10 @@ export class TemplatesService {
   }
 
   async findOne(id: string) {
+    const data = await this.templateModel.findById(id).lean();
     return {
-      message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.templateModel.findById(id),
+      message: data ? STRINGS.RESPONSES.SUCCESS : STRINGS.RESPONSES.NOT_FOUND,
+      data: data,
     };
   }
 

@@ -1,6 +1,7 @@
 {
   "RESPONSES": {
     "SUCCESS": "Success",
+    "NOT_FOUND": "Not found",
     "USER_CREATED_SUCCESSFULLY": "User created successfully.",
     "BAD_REQUEST_EXCEPTION": "Bad Request Exception",
     "USER_ALREADY_EXISTS": "User already exists.",

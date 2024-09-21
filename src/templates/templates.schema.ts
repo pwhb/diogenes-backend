@@ -9,7 +9,7 @@ export type LangString = {
 export type TemplateDocument = HydratedDocument<Template>;
 @Schema({ timestamps: true })
 export class Template extends Base {
-  @Prop({ required: true })
+  @Prop({ required: true, type: Object })
   name: LangString;
 
   @Prop({ required: true, unique: true })
@@ -18,13 +18,13 @@ export class Template extends Base {
   @Prop({ required: true })
   type: string;
 
-  @Prop()
+  @Prop({ type: Object })
   config: {
     params: string[];
     init: string;
   };
 
-  @Prop()
+  @Prop({ type: Object })
   metadata: {
     icon?: string;
     image?: string;
