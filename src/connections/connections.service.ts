@@ -13,11 +13,23 @@ export class ConnectionsService {
     return this.connectionModel.create(dto);
   }
 
-  sendRequest(dto: Connection) {
-    return this.connectionModel.create(dto);
+  sendRequest(senderId: string, receiverId: string) {
+    return this.connectionModel.create({
+      userId: senderId,
+      friendId: receiverId,
+    });
   }
 
   acceptRequest(dto: Connection) {
     return this.connectionModel.create(dto);
+  }
+
+  areFriends(ids: string[]) {
+    return !!this.connectionModel.countDocuments({
+      $and: [
+        { userId: ids[0], friendId: ids[1] },
+        { userId: ids[1], friendId: ids[0] },
+      ],
+    });
   }
 }

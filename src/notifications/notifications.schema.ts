@@ -3,13 +3,17 @@ import { HydratedDocument, Types } from 'mongoose';
 import { Base } from 'src/common/schema/base.schema';
 import { User } from 'src/users/users.schema';
 
-export type ConnectionDocument = HydratedDocument<Connection>;
+export type NotificationDocument = HydratedDocument<Notification>;
 @Schema({ timestamps: true })
-export class Connection extends Base {
+export class Notification extends Base {
   @Prop({ type: Types.ObjectId, ref: User.name })
   userId: string;
-  @Prop({ type: Types.ObjectId, ref: User.name })
-  friendId: string;
+
+  @Prop({ type: Object })
+  config: {
+    params: string[];
+    init: string;
+  };
 }
 
-export const ConnectionSchema = SchemaFactory.createForClass(Connection);
+export const NotificationSchema = SchemaFactory.createForClass(Notification);

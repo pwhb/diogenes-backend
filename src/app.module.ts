@@ -20,6 +20,7 @@ import { HomeModule } from './home/home.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { ConnectionsModule } from './connections/connections.module';
 import { CacheService } from './cache/cache.service';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { CacheService } from './cache/cache.service';
     HomeModule,
     RoomsModule,
     ConnectionsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

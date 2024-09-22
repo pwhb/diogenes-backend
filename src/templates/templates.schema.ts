@@ -6,6 +6,12 @@ export type LangString = {
   [key: string]: string;
 };
 
+export enum TemplateType {
+  GAME = 'GAME',
+  MESSAGE = 'MESSAGE',
+  NOTIFICATION = 'NOTIFICATION',
+}
+
 export type TemplateDocument = HydratedDocument<Template>;
 @Schema({ timestamps: true })
 export class Template extends Base {
@@ -16,7 +22,7 @@ export class Template extends Base {
   slug: string;
 
   @Prop({ required: true })
-  type: string;
+  type: TemplateType;
 
   @Prop({ required: true, default: 'inactive' })
   status: string;
@@ -24,6 +30,11 @@ export class Template extends Base {
   @Prop({ type: Object })
   config: {
     params: string[];
+    actions: {
+      name: string;
+      action: string;
+      params: string[];
+    }[];
     init: string;
   };
 

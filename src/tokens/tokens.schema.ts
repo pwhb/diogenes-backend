@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { Base } from 'src/common/schema/base.schema';
+import { User } from 'src/users/users.schema';
 
 export type TokenDocument = HydratedDocument<Token>;
 @Schema({ timestamps: true })
@@ -11,7 +12,7 @@ export class Token extends Base {
   @Prop()
   token: string;
 
-  @Prop({ type: Types.ObjectId, ref: 'User' })
+  @Prop({ type: Types.ObjectId, ref: User.name })
   userId: Types.ObjectId;
 
   @Prop({ type: Date })
