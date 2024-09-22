@@ -12,4 +12,12 @@ export class ConnectionsService {
   create(dto: Connection) {
     return this.connectionModel.create(dto);
   }
+
+  sendRequest(dto: Connection) {
+    return this.connectionModel.create(dto);
+  }
+
+  acceptRequest(dto: Connection) {
+    return this.connectionModel.create(dto);
+  }
 }
