@@ -17,8 +17,6 @@ export class AuthService {
     userId: Types.ObjectId;
     password: string;
   }) {
-    console.log(userId, password);
-
     return this.authModel.create({
       userId: userId,
       password: await hash(password),

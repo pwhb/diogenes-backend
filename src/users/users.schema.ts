@@ -27,6 +27,9 @@ export class User extends Base {
 
   @Prop({ required: true, default: 'init' })
   status?: string;
+
+  @Prop({ required: true, default: 'player' })
+  type?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

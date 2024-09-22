@@ -17,6 +17,7 @@ import { TemplatesModule } from './templates/templates.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard, RoleGuard } from './auth/auth.guard';
 import { HomeModule } from './home/home.module';
+import { RoomsModule } from './rooms/rooms.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { HomeModule } from './home/home.module';
     TokensModule,
     TemplatesModule,
     HomeModule,
+    RoomsModule,
   ],
   controllers: [AppController],
   providers: [

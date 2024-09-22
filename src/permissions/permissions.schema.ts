@@ -14,6 +14,9 @@ export class Permission extends Base {
   @Prop({ required: true })
   method: string;
 
+  @Prop({ required: true })
+  slug: string;
+
   @Prop({ default: ['root'], type: [String] })
   allowedRoles: string[];
 }

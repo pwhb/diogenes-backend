@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePermissionDto } from './dto/create-permission.dto';
-import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Permission } from './permissions.schema';
-import { Model } from 'mongoose';
+import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import STRINGS from 'src/common/consts/strings.json';
-import { QueryPermissionDto } from './dto/query-permission.dto';
-import { parseQuery, QueryType } from 'src/common/db/query';
+import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 @Injectable()
 export class PermissionsService {
@@ -15,34 +13,23 @@ export class PermissionsService {
     private readonly permissionModel: Model<Permission>,
   ) {}
 
-  async createPermission(createPermissionDto: CreatePermissionDto) {
-    createPermissionDto.slug = createPermissionDto.path.split('/')[3];
-    if (!createPermissionDto.name) {
+  async create(dto: CreatePermissionDto) {
+    dto.slug = dto.path.split('/')[3];
+    if (!dto.name) {
       let action = '';
-      if (createPermissionDto.method === 'GET') action = 'read';
-      if (createPermissionDto.method === 'POST') action = 'create';
-      if (
-        createPermissionDto.method === 'PATCH' ||
-        createPermissionDto.method === 'PUT'
-      )
-        action = 'update';
-      if (createPermissionDto.method === 'DELETE') action = 'delete';
-      createPermissionDto.name =
-        `${action} ${createPermissionDto.slug}`.toUpperCase();
+      if (dto.method === 'GET') action = 'read';
+      if (dto.method === 'POST') action = 'create';
+      if (dto.method === 'PATCH' || dto.method === 'PUT') action = 'update';
+      if (dto.method === 'DELETE') action = 'delete';
+      dto.name = `${action} ${dto.slug}`.toUpperCase();
     }
-    return await this.permissionModel.create(createPermissionDto);
-  }
-  async create(createPermissionDto: CreatePermissionDto) {
-    await this.createPermission(createPermissionDto);
-    return {
-      message: STRINGS.RESPONSES.SUCCESS,
-    };
+    return this.permissionModel.create(dto);
   }
 
   async getPermissionId(query: { path: string; method: string }) {
     const found = await this.permissionModel.findOne(query).lean();
     if (found) return found._id;
-    const created = await this.createPermission(query);
+    const created = await this.create(query);
     return created._id;
   }
 
@@ -60,52 +47,42 @@ export class PermissionsService {
       )
         return true;
     }
-    await this.createPermission(query);
+    await this.create(query);
     return false;
   }
 
-  async findAll(query: QueryPermissionDto) {
-    const { skip, limit, page, sort, filter } = parseQuery(query, [
-      {
-        key: 'q',
-        type: QueryType.Regex,
-        searchedFields: ['method', 'path', 'name'],
-      },
-    ]);
-
+  async findAll({
+    filter,
+    skip,
+    limit,
+    sort,
+  }: {
+    filter: FilterQuery<Permission>;
+    skip: number;
+    limit: number;
+    sort: QueryOptions<Permission>;
+  }) {
     const docs = await this.permissionModel
       .find(filter, {}, { skip, limit, sort })
       .lean();
     const count = await this.permissionModel.countDocuments(filter);
     return {
-      message: STRINGS.RESPONSES.SUCCESS,
-      page,
-      size: limit,
       count,
       data: docs,
     };
   }
 
-  async findOne(id: string) {
-    return {
-      message: STRINGS.RESPONSES.SUCCESS,
-      data: await this.permissionModel.findById(id).lean(),
-    };
+  findOne(id: string) {
+    return this.permissionModel.findById(id).lean();
   }
 
-  async update(id: string, updatePermissionDto: UpdatePermissionDto) {
-    await this.permissionModel
-      .findByIdAndUpdate(id, updatePermissionDto)
+  update(id: string, dto: UpdatePermissionDto) {
+    return this.permissionModel
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .lean();
-    return {
-      message: STRINGS.RESPONSES.SUCCESS,
-    };
   }
 
-  async remove(id: string) {
-    await this.permissionModel.findByIdAndDelete(id).lean();
-    return {
-      message: STRINGS.RESPONSES.SUCCESS,
-    };
+  remove(id: string) {
+    return this.permissionModel.findByIdAndDelete(id).lean();
   }
 }

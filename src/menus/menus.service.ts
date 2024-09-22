@@ -1,26 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
+import { Menu } from './menus.schema';
+import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class MenusService {
-  create(createMenuDto: CreateMenuDto) {
-    return 'This action adds a new menu';
+  constructor(
+    @InjectModel(Menu.name)
+    private readonly menuModel: Model<Menu>,
+  ) {}
+  async create(dto: CreateMenuDto) {
+    return this.menuModel.create(dto);
   }
 
-  findAll() {
-    return `This action returns all menus`;
+  async findAll({
+    filter,
+    skip,
+    limit,
+    sort,
+  }: {
+    filter: FilterQuery<Menu>;
+    skip: number;
+    limit: number;
+    sort: QueryOptions<Menu>;
+  }) {
+    const docs = await this.menuModel
+      .find(filter, {}, { skip, limit, sort })
+      .lean();
+    const count = await this.menuModel.countDocuments(filter);
+    return {
+      count,
+      data: docs,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} menu`;
+  findOne(id: string) {
+    return this.menuModel.findById(id).lean();
   }
 
-  update(id: number, updateMenuDto: UpdateMenuDto) {
-    return `This action updates a #${id} menu`;
+  update(id: string, dto: UpdateMenuDto) {
+    return this.menuModel
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
+      .lean();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} menu`;
+  remove(id: string) {
+    return this.menuModel.findByIdAndDelete(id).lean();
   }
 }
