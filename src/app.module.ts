@@ -19,6 +19,7 @@ import { AuthGuard, RoleGuard } from './auth/auth.guard';
 import { HomeModule } from './home/home.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { ConnectionsModule } from './connections/connections.module';
+import { CacheService } from './cache/cache.service';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { ConnectionsModule } from './connections/connections.module';
     AppService,
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: RoleGuard },
+    CacheService,
   ],
 })
 export class AppModule {}

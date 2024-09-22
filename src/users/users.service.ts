@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { CacheService } from 'src/cache/cache.service';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    private readonly cacheService: CacheService,
   ) {}
 
   create(dto: User) {
@@ -18,7 +22,9 @@ export class UsersService {
   }
 
   findUserById(userId: string) {
-    return this.userModel.findById(userId).populate('role').lean();
+    return this.cacheService.get(userId, () =>
+      this.userModel.findById(userId).populate('role').lean(),
+    );
   }
 
   async findAll({
