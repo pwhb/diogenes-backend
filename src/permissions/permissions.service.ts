@@ -3,7 +3,6 @@ import { CreatePermissionDto } from './dto/create-permission.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Permission } from './permissions.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
-import STRINGS from 'src/common/consts/strings.json';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
 
 @Injectable()

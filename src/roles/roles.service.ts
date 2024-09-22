@@ -5,9 +5,6 @@ import { Role } from './roles.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
-import { parseQuery, QueryType } from 'src/common/db/query';
-import { QueryRoleDto } from './dto/query-role.dto';
-
 @Injectable()
 export class RolesService {
   constructor(@InjectModel(Role.name) private roleModel: Model<Role>) {}
