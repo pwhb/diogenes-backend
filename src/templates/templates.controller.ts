@@ -8,12 +8,13 @@ import {
   Delete,
   Query,
   Res,
+  Req,
 } from '@nestjs/common';
 import { TemplatesService } from './templates.service';
 import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
 import { QueryTemplateDto } from './dto/query-role.dto';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import STRINGS from 'src/common/consts/strings.json';
 import { parseQuery, QueryType } from 'src/common/db/query';
 
@@ -21,7 +22,12 @@ import { parseQuery, QueryType } from 'src/common/db/query';
 export class TemplatesController {
   constructor(private readonly templatesService: TemplatesService) {}
   @Post()
-  async create(@Body() dto: CreateTemplateDto, @Res() res: Response) {
+  async create(
+    @Body() dto: CreateTemplateDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    dto['createdBy'] = req['user']['_id'];
     const data = await this.templatesService.create(dto);
     return res.status(200).json({
       message: STRINGS.RESPONSES.SUCCESS,
@@ -68,9 +74,11 @@ export class TemplatesController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
+    @Req() req: Request,
     @Body() dto: UpdateTemplateDto,
     @Res() res: Response,
   ) {
+    dto['updatedBy'] = req['user']['_id'];
     const data = await this.templatesService.update(id, dto);
     if (!data)
       return res.status(404).json({ message: STRINGS.RESPONSES.NOT_FOUND });

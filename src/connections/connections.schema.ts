@@ -13,3 +13,4 @@ export class Connection extends Base {
 }
 
 export const ConnectionSchema = SchemaFactory.createForClass(Connection);
+ConnectionSchema.index({ userId: 1, friendId: 1 }, { unique: true });

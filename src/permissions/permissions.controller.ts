@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   Res,
+  Req,
 } from '@nestjs/common';
 import { PermissionsService } from './permissions.service';
 import { CreatePermissionDto } from './dto/create-permission.dto';
@@ -15,7 +16,7 @@ import { UpdatePermissionDto } from './dto/update-permission.dto';
 import { QueryPermissionDto } from './dto/query-permission.dto';
 import STRINGS from 'src/common/consts/strings.json';
 import { parseQuery, QueryType } from 'src/common/db/query';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { ApiTags } from '@nestjs/swagger';
 @ApiTags('permissions')
 @Controller('api/v1/permissions')
@@ -23,7 +24,12 @@ export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   @Post()
-  async create(@Body() dto: CreatePermissionDto, @Res() res: Response) {
+  async create(
+    @Body() dto: CreatePermissionDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    dto['createdBy'] = req['user']['_id'];
     const data = await this.permissionsService.create(dto);
     return res.status(200).json({
       message: STRINGS.RESPONSES.SUCCESS,
@@ -71,8 +77,10 @@ export class PermissionsController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdatePermissionDto,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
+    dto['updatedBy'] = req['user']['_id'];
     const data = await this.permissionsService.update(id, dto);
     if (!data)
       return res.status(404).json({ message: STRINGS.RESPONSES.NOT_FOUND });

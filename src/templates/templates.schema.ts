@@ -32,7 +32,8 @@ export class Template extends Base {
     params: string[];
     actions: {
       name: string;
-      action: string;
+      model: string;
+      method: string;
       params: string[];
     }[];
     init: string;

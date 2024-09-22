@@ -16,7 +16,13 @@ export class UsersService {
   }
 
   findUser(filter: FilterQuery<User>) {
-    return this.userModel.findOne(filter).populate('role', 'name').lean();
+    return this.userModel
+      .findOne(filter)
+      .populate('role', {
+        _id: 0,
+        name: 1,
+      })
+      .lean();
   }
 
   findUserById(userId: string) {

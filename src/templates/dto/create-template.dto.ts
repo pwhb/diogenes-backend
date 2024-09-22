@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsObject, IsOptional } from 'class-validator';
-import { LangString } from '../templates.schema';
+import { LangString, TemplateType } from '../templates.schema';
 
 export class CreateTemplateDto {
   @ApiProperty()
@@ -16,7 +16,7 @@ export class CreateTemplateDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  type: string;
+  type: TemplateType;
 
   @ApiProperty()
   @IsOptional()
