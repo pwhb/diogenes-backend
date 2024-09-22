@@ -49,6 +49,10 @@ export class GenericExceptionFilter implements ExceptionFilter {
       updateConsts(message);
     }
 
+    if (process.env['NODE_ENV'] === 'DEV') {
+      console.error(exception);
+    }
+
     response.status(status).json({
       statusCode: status,
       message: message,

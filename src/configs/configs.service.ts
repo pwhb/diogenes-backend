@@ -20,6 +20,10 @@ export class ConfigsService {
     );
   }
 
+  async resetCache(): Promise<any> {
+    return this.cacheService.reset();
+  }
+
   async create(createConfigDto: CreateConfigDto) {
     const data = await this.configModel.create(createConfigDto);
     return data;

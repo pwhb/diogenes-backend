@@ -1,10 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 import { CacheService } from 'src/cache/cache.service';
 @Injectable()
 export class UsersService {
@@ -22,7 +20,7 @@ export class UsersService {
   }
 
   findUserById(userId: string) {
-    return this.cacheService.get(userId, () =>
+    return this.cacheService.get(`user:${userId}`, () =>
       this.userModel.findById(userId).populate('role').lean(),
     );
   }

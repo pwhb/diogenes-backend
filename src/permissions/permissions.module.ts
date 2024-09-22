@@ -3,6 +3,7 @@ import { PermissionsService } from './permissions.service';
 import { PermissionsController } from './permissions.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Permission, PermissionSchema } from './permissions.schema';
+import { CacheService } from 'src/cache/cache.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { Permission, PermissionSchema } from './permissions.schema';
     ]),
   ],
   controllers: [PermissionsController],
-  providers: [PermissionsService],
+  providers: [PermissionsService, CacheService],
   exports: [PermissionsService],
 })
 export class PermissionsModule {}

@@ -79,9 +79,6 @@ export class RoleGuard implements CanActivate {
         { path: parsed, method: method },
         request.user.role,
       );
-      request.user.role = {
-        name: request.user.role.name,
-      };
       return allowed;
     }
     return false;

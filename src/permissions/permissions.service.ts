@@ -4,12 +4,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Permission } from './permissions.schema';
 import { FilterQuery, Model, QueryOptions } from 'mongoose';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class PermissionsService {
   constructor(
     @InjectModel(Permission.name)
     private readonly permissionModel: Model<Permission>,
+    private readonly cacheService: CacheService,
   ) {}
 
   async create(dto: CreatePermissionDto) {
@@ -36,7 +38,11 @@ export class PermissionsService {
     let allowedRoles = ['root'];
     if (allowedRoles.includes(role.name)) return true;
 
-    const found = await this.permissionModel.findOne(query).lean();
+    const found = await this.cacheService.get(
+      `permission:${query.method}:${query.path}`,
+      () => this.permissionModel.findOne(query).lean(),
+    );
+
     if (found) {
       allowedRoles = found.allowedRoles;
       if (
@@ -75,7 +81,8 @@ export class PermissionsService {
     return this.permissionModel.findById(id).lean();
   }
 
-  update(id: string, dto: UpdatePermissionDto) {
+  async update(id: string, dto: UpdatePermissionDto) {
+    await this.cacheService.del(`permission:${dto.method}:${dto.path}`);
     return this.permissionModel
       .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .lean();

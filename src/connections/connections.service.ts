@@ -7,6 +7,9 @@ import { Model } from 'mongoose';
 export class ConnectionsService {
   constructor(
     @InjectModel(Connection.name)
-    private readonly tokenModel: Model<Connection>,
+    private readonly connectionModel: Model<Connection>,
   ) {}
+  create(dto: Connection) {
+    return this.connectionModel.create(dto);
+  }
 }

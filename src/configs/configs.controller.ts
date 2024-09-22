@@ -91,4 +91,13 @@ export class ConfigsController {
       data,
     });
   }
+
+  @Post('resetCache')
+  async resetCache(@Res() res: Response) {
+    const data = await this.configsService.resetCache();
+    return res.status(200).json({
+      message: STRINGS.RESPONSES.SUCCESS,
+      data,
+    });
+  }
 }

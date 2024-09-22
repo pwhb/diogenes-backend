@@ -22,9 +22,13 @@ export class AuthController {
 
   @Get('me')
   me(@Req() req: Request, @Res() res: Response) {
+    const me = { ...req['user'] };
+    me['role'] = {
+      name: me['role']['name'],
+    };
     return res.status(200).json({
       message: STRINGS.RESPONSES.SUCCESS,
-      data: req['user'],
+      data: me,
     });
   }
 
