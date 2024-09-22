@@ -54,11 +54,19 @@ export class HomeController {
       reqUserId,
       user._id,
     ]);
+    let status = 'strangers';
+    if (connections.length === 2) status = 'friends';
+    if (connections.length === 1) {
+      status =
+        connections[0].userId.toString() === reqUserId.toString()
+          ? 'added'
+          : 'accept';
+    }
     return res.status(200).json({
       message: STRINGS.RESPONSES.SUCCESS,
       data: {
         user: user,
-        connections: connections,
+        status: status,
       },
     });
   }

@@ -7,9 +7,9 @@ export type ConnectionDocument = HydratedDocument<Connection>;
 @Schema({ timestamps: true })
 export class Connection extends Base {
   @Prop({ type: Types.ObjectId, ref: User.name })
-  userId: string;
+  userId: Types.ObjectId;
   @Prop({ type: Types.ObjectId, ref: User.name })
-  friendId: string;
+  friendId: Types.ObjectId;
 }
 
 export const ConnectionSchema = SchemaFactory.createForClass(Connection);

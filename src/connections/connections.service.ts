@@ -53,11 +53,13 @@ export class ConnectionsService {
   }
 
   getConnections(ids: Types.ObjectId[]) {
-    return this.connectionModel.find({
-      $or: [
-        { userId: ids[0], friendId: ids[1] },
-        { userId: ids[1], friendId: ids[0] },
-      ],
-    });
+    return this.connectionModel
+      .find({
+        $or: [
+          { userId: ids[0], friendId: ids[1] },
+          { userId: ids[1], friendId: ids[0] },
+        ],
+      })
+      .lean();
   }
 }
