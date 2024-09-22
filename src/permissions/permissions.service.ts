@@ -49,8 +49,10 @@ export class PermissionsService {
         allowedRoles.includes(role.name) ||
         allowedRoles.includes('public') ||
         role.permissionsIds.includes(found._id.toString())
-      )
+      ) {
         return true;
+      }
+      return false;
     }
     await this.create(query);
     return false;

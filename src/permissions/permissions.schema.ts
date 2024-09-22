@@ -22,3 +22,5 @@ export class Permission extends Base {
 }
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);
+
+PermissionSchema.index({ path: 1, method: 1 }, { unique: true });
