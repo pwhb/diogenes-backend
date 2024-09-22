@@ -58,9 +58,9 @@ export class PermissionsService {
     sort,
   }: {
     filter: FilterQuery<Permission>;
-    skip: number;
-    limit: number;
-    sort: QueryOptions<Permission>;
+    skip?: number;
+    limit?: number;
+    sort?: QueryOptions<Permission>;
   }) {
     const docs = await this.permissionModel
       .find(filter, {}, { skip, limit, sort })

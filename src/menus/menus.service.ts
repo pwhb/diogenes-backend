@@ -22,9 +22,9 @@ export class MenusService {
     sort,
   }: {
     filter: FilterQuery<Menu>;
-    skip: number;
-    limit: number;
-    sort: QueryOptions<Menu>;
+    skip?: number;
+    limit?: number;
+    sort?: QueryOptions<Menu>;
   }) {
     const docs = await this.menuModel
       .find(filter, {}, { skip, limit, sort })

@@ -29,9 +29,9 @@ export class UsersService {
     sort,
   }: {
     filter: FilterQuery<User>;
-    skip: number;
-    limit: number;
-    sort: QueryOptions<User>;
+    skip?: number;
+    limit?: number;
+    sort?: QueryOptions<User>;
   }) {
     const docs = await this.userModel
       .find(filter, {}, { skip, limit, sort })

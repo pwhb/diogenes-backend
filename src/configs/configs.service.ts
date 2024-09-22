@@ -41,9 +41,9 @@ export class ConfigsService {
     sort,
   }: {
     filter: FilterQuery<Config>;
-    skip: number;
-    limit: number;
-    sort: QueryOptions<Config>;
+    skip?: number;
+    limit?: number;
+    sort?: QueryOptions<Config>;
   }) {
     const docs = await this.configModel
       .find(filter, {}, { skip, limit, sort })

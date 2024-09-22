@@ -11,7 +11,9 @@ export class HomeController {
   @Get('games')
   getGames() {
     return this.templatesService.findAll({
-      type: 'game',
+      filter: {
+        type: 'game',
+      },
     });
   }
 }

@@ -22,9 +22,9 @@ export class RolesService {
     sort,
   }: {
     filter: FilterQuery<Role>;
-    skip: number;
-    limit: number;
-    sort: QueryOptions<Role>;
+    skip?: number;
+    limit?: number;
+    sort?: QueryOptions<Role>;
   }) {
     const docs = await this.roleModel
       .find(filter, {}, { skip, limit, sort })

@@ -21,9 +21,9 @@ export class TemplatesService {
     sort,
   }: {
     filter: FilterQuery<Template>;
-    skip: number;
-    limit: number;
-    sort: QueryOptions<Template>;
+    skip?: number;
+    limit?: number;
+    sort?: QueryOptions<Template>;
   }) {
     const docs = await this.templateModel
       .find(filter, {}, { skip, limit, sort })
