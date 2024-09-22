@@ -11,5 +11,6 @@ import { MessagesService } from './messages/messages.service';
   ],
   controllers: [RoomsController],
   providers: [RoomsService, MessagesService],
+  exports: [RoomsService],
 })
 export class RoomsModule {}

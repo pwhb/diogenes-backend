@@ -1,15 +1,32 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
-import { Room } from './rooms.schema';
+import { Room, RoomType } from './rooms.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, QueryOptions } from 'mongoose';
+import { FilterQuery, Model, QueryOptions, Types } from 'mongoose';
 
 @Injectable()
 export class RoomsService {
   constructor(@InjectModel(Room.name) private roomModel: Model<Room>) {}
   async create(dto: CreateRoomDto) {
     return this.roomModel.create(dto);
+  }
+
+  async createFriendChat({ participants }: { participants: Types.ObjectId[] }) {
+    return this.roomModel
+      .findOneAndUpdate(
+        {
+          type: RoomType.DIRECT,
+          participants: participants,
+        },
+        {
+          type: RoomType.DIRECT,
+          participants: participants,
+          status: 'active',
+        },
+        { upsert: true, returnDocument: 'after' },
+      )
+      .lean();
   }
 
   async findAll({

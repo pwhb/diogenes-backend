@@ -57,7 +57,6 @@ export class TokensService {
         {
           token: uuidv4(),
           expiredAt: dayjs().add(duration, 'day'),
-          updatedAt: dayjs(),
           rememberMe,
         },
         { upsert: true, returnDocument: 'after' },

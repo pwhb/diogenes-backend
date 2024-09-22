@@ -22,6 +22,10 @@ export class UsersService {
         _id: 0,
         name: 1,
       })
+      .select({
+        deviceId: 0,
+        updatedAt: 0,
+      })
       .lean();
   }
 

@@ -1,31 +1,34 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument, Types } from 'mongoose';
 import { Base } from 'src/common/schema/base.schema';
 import { User } from 'src/users/users.schema';
 
 export type RoomDocument = HydratedDocument<Room>;
+export enum RoomType {
+  GROUP = 'GROUP',
+  DIRECT = 'DIRECT',
+  GAME = 'GAME',
+}
 @Schema({ timestamps: true })
 export class Room extends Base {
   @Prop({ type: Object })
   metadata: {
     icon?: string;
     name?: string;
-    isGroup?: boolean;
   };
 
   @Prop({
-    type: [
-      {
-        id: { type: mongoose.Schema.Types.ObjectId, ref: User.name },
-        role: { type: String, default: 'member' },
-        status: { type: String, default: 'pending' },
-      },
-    ],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }],
   })
-  participants: string[];
+  participants: Types.ObjectId[];
 
-  @Prop({ required: true, default: 'chat' })
-  type: string;
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }],
+  })
+  admins: Types.ObjectId[];
+
+  @Prop({ required: true })
+  type: RoomType;
 
   @Prop({ required: true, default: 'private' })
   visibility: string;
