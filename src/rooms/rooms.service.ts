@@ -29,6 +29,23 @@ export class RoomsService {
       .lean();
   }
 
+  async getRoomList(id: Types.ObjectId) {
+    const filter = {
+      participants: id,
+    };
+    const data = await this.roomModel
+      .find(filter)
+      .populate([
+        {
+          path: 'participants',
+          select: 'username',
+        },
+      ])
+      .lean();
+    const count = await this.roomModel.countDocuments(filter);
+    return { data, count };
+  }
+
   async findAll({
     filter,
     skip,

@@ -34,6 +34,39 @@ export class HomeController {
     };
   }
 
+  @Get('friends')
+  async getFriendList(
+    @Req() req: Request,
+    // @Query() query: any,
+    @Res() res: Response,
+  ) {
+    const reqUserId = new Types.ObjectId(req['user']['_id'] as string);
+    const { data, count } =
+      await this.connectionsService.getFriendList(reqUserId);
+
+    return res.status(200).json({
+      message: STRINGS.RESPONSES.SUCCESS,
+      count,
+      data: data,
+    });
+  }
+
+  @Get('rooms')
+  async getRoomList(
+    @Req() req: Request,
+    // @Query() query: any,
+    @Res() res: Response,
+  ) {
+    const reqUserId = new Types.ObjectId(req['user']['_id'] as string);
+    const { data, count } = await this.roomsService.getRoomList(reqUserId);
+
+    return res.status(200).json({
+      message: STRINGS.RESPONSES.SUCCESS,
+      count,
+      data: data,
+    });
+  }
+
   @Get('friends/:username')
   async findFriends(
     @Param('username') username: string,
@@ -50,18 +83,25 @@ export class HomeController {
     });
     if (!user)
       return res.status(404).json({ message: STRINGS.RESPONSES.NOT_FOUND });
-    const connections = await this.connectionsService.getConnections([
-      reqUserId,
-      user._id,
-    ]);
     let status = 'strangers';
-    if (connections.length === 2) status = 'friends';
-    if (connections.length === 1) {
-      status =
-        connections[0].userId.toString() === reqUserId.toString()
-          ? 'added'
-          : 'accept';
+
+    const connection = await this.connectionsService.findOne({
+      $or: [
+        { user1: reqUserId, user2: user._id },
+        { user1: user._id, user2: reqUserId },
+      ],
+    });
+
+    if (connection) {
+      status = connection.status;
+      if (status === 'pending') {
+        status =
+          connection.user1.toString() === reqUserId.toString()
+            ? 'sent'
+            : 'received';
+      }
     }
+
     return res.status(200).json({
       message: STRINGS.RESPONSES.SUCCESS,
       data: {
@@ -80,8 +120,9 @@ export class HomeController {
     const reqUserId = new Types.ObjectId(req['user']['_id'] as string);
     const friendId = new Types.ObjectId(body.friendId as string);
     const data = await this.connectionsService.create({
-      userId: reqUserId,
-      friendId: friendId,
+      user1: reqUserId,
+      user2: friendId,
+      status: 'pending',
     });
     return res.status(200).json({
       message: STRINGS.RESPONSES.SUCCESS,
@@ -97,26 +138,27 @@ export class HomeController {
   ) {
     const reqUserId = new Types.ObjectId(req['user']['_id'] as string);
     const friendId = new Types.ObjectId(body.friendId as string);
-    if (
-      await this.connectionsService.isRequestSent({
-        userId: friendId,
-        friendId: reqUserId,
-      })
-    ) {
-      await this.connectionsService.create({
-        userId: reqUserId,
-        friendId: friendId,
-      });
-      await this.roomsService.createFriendChat({
-        participants: [friendId, reqUserId],
-      });
+    const connection = await this.connectionsService.findOne({
+      user1: friendId,
+      user2: reqUserId,
+      status: 'pending',
+    });
 
-      return res.status(200).json({
-        message: STRINGS.RESPONSES.SUCCESS,
+    if (!connection) {
+      return res.status(404).json({
+        message: STRINGS.RESPONSES.NOT_FOUND,
       });
     }
-    return res.status(404).json({
-      message: STRINGS.RESPONSES.NOT_FOUND,
+
+    await this.connectionsService.update(connection._id, {
+      status: 'friends',
+    });
+    await this.roomsService.createFriendChat({
+      participants: [friendId, reqUserId],
+    });
+
+    return res.status(200).json({
+      message: STRINGS.RESPONSES.SUCCESS,
     });
   }
 }

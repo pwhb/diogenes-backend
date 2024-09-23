@@ -7,10 +7,14 @@ export type ConnectionDocument = HydratedDocument<Connection>;
 @Schema({ timestamps: true })
 export class Connection extends Base {
   @Prop({ type: Types.ObjectId, ref: User.name })
-  userId: Types.ObjectId;
+  user1: Types.ObjectId;
+
   @Prop({ type: Types.ObjectId, ref: User.name })
-  friendId: Types.ObjectId;
+  user2: Types.ObjectId;
+
+  @Prop({ default: 'pending' })
+  status: string;
 }
 
 export const ConnectionSchema = SchemaFactory.createForClass(Connection);
-ConnectionSchema.index({ userId: 1, friendId: 1 }, { unique: true });
+ConnectionSchema.index({ user1: 1, user2: 1 }, { unique: true });

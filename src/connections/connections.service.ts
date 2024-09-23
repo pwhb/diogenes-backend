@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Connection } from './connections.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 
 @Injectable()
 export class ConnectionsService {
@@ -9,57 +9,51 @@ export class ConnectionsService {
     @InjectModel(Connection.name)
     private readonly connectionModel: Model<Connection>,
   ) {}
-  async create({
-    userId,
-    friendId,
-  }: {
-    userId: Types.ObjectId;
-    friendId: Types.ObjectId;
-  }) {
+  create({ user1, user2 }: Connection) {
     return this.connectionModel
       .findOneAndUpdate(
-        { userId: userId, friendId: friendId },
         {
-          userId: userId,
-          friendId: friendId,
+          user1,
+          user2,
+        },
+        {
+          user1,
+          user2,
         },
         { upsert: true, returnDocument: 'after' },
       )
       .lean();
   }
 
-  async isRequestSent({
-    userId,
-    friendId,
-  }: {
-    userId: Types.ObjectId;
-    friendId: Types.ObjectId;
-  }) {
-    return (
-      (await this.connectionModel.countDocuments({
-        userId: userId,
-        friendId: friendId,
-      })) > 0
-    );
+  findOne(filter: FilterQuery<Connection>) {
+    return this.connectionModel.findOne(filter).lean();
   }
 
-  areFriends(ids: string[]) {
-    return !!this.connectionModel.countDocuments({
-      $and: [
-        { userId: ids[0], friendId: ids[1] },
-        { userId: ids[1], friendId: ids[0] },
-      ],
-    });
-  }
-
-  getConnections(ids: Types.ObjectId[]) {
+  update(id: string | Types.ObjectId, dto: { status: string }) {
     return this.connectionModel
-      .find({
-        $or: [
-          { userId: ids[0], friendId: ids[1] },
-          { userId: ids[1], friendId: ids[0] },
-        ],
-      })
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .lean();
+  }
+
+  async getFriendList(id: Types.ObjectId) {
+    const filter = {
+      $or: [{ user1: id }, { user2: id }],
+      status: 'friends',
+    };
+    const data = await this.connectionModel
+      .find(filter)
+      .populate([
+        {
+          path: 'user1',
+          select: 'username',
+        },
+        {
+          path: 'user2',
+          select: 'username',
+        },
+      ])
+      .lean();
+    const count = await this.connectionModel.countDocuments(filter);
+    return { data, count };
   }
 }
