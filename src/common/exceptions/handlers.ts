@@ -1,20 +1,18 @@
-import
-  {
-    ArgumentsHost,
-    BadRequestException,
-    Catch,
-    ExceptionFilter,
-    HttpException,
-    HttpStatus,
-    Logger,
-  } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  BadRequestException,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { Request, Response } from 'express';
 import STRINGS from 'src/common/consts/strings.json';
 import { updateConsts } from './interceptors';
 
-export function validationExceptionHandler (errors: ValidationError[])
-{
+export function validationExceptionHandler(errors: ValidationError[]) {
   const result = errors.map((error) => ({
     property: error.property,
     message: Object.values(error.constraints)[0],
@@ -22,21 +20,17 @@ export function validationExceptionHandler (errors: ValidationError[])
   return new BadRequestException(result);
 }
 
-function MongoServerErrorHandler (exception: Error & { code?: any })
-{
-  if (exception.code === 11000)
-  {
+function MongoServerErrorHandler(exception: Error & { code?: any }) {
+  if (exception.code === 11000) {
     return STRINGS.RESPONSES.DUPLICATE_KEY_ERROR;
   }
   return exception.message;
 }
 
 @Catch()
-export class GenericExceptionFilter implements ExceptionFilter
-{
+export class GenericExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(GenericExceptionFilter.name);
-  catch (exception: Error, host: ArgumentsHost)
-  {
+  catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
@@ -50,17 +44,14 @@ export class GenericExceptionFilter implements ExceptionFilter
         ? exception.getResponse()
         : exception.message || STRINGS.RESPONSES.INTERNAL_SERVER_ERROR;
 
-    if (exception.name === 'MongoServerError')
-    {
+    if (exception.name === 'MongoServerError') {
       message = MongoServerErrorHandler(exception);
     }
-    if (typeof message === 'string')
-    {
+    if (typeof message === 'string') {
       updateConsts(message);
     }
 
-    if (process.env['NODE_ENV'] === 'DEV')
-    {
+    if (process.env['NODE_ENV'] === 'DEV') {
       this.logger.error(exception);
     }
 

@@ -1,4 +1,5 @@
-import {
+import
+{
   CanActivate,
   ExecutionContext,
   HttpException,
@@ -12,69 +13,93 @@ import { Reflector } from '@nestjs/core';
 import { PermissionsService } from 'src/permissions/permissions.service';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { UsersService } from 'src/users/users.service';
+import { Socket } from 'socket.io';
+import { WsException } from '@nestjs/websockets';
 
-export const IS_PUBLIC_KEY = 'isPublic';
+const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+
+function extractTokenFromHeader(header: string): string | undefined
+{
+  const [type, token] = header?.split(' ') ?? [];
+  return type === 'Bearer' ? token : undefined;
+}
+
+function parseUrl(url: string, params: Record<string, string>)
+{
+  for (const [key, value] of Object.entries(params))
+  {
+    url = url.replace(value, `:${key}`);
+  }
+  return url;
+}
+
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AuthGuard implements CanActivate
+{
   constructor(
     private readonly tokensService: TokensService,
     private readonly usersService: UsersService,
     private readonly reflector: Reflector,
-  ) {}
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  ) { }
+  async canActivate(context: ExecutionContext): Promise<boolean>
+  {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    if (isPublic) {
+    if (isPublic)
+    {
       // 💡 See this condition
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    const token = extractTokenFromHeader(request.headers.authorization);
     if (!token) throw new UnauthorizedException();
 
-    try {
+    try
+    {
       const payload = await this.tokensService.verifyAsync(token);
       if (!payload || !payload.userId) throw new UnauthorizedException();
       const user = await this.usersService.findUserById(payload.userId);
       if (!user) throw new UnauthorizedException();
       request['user'] = user;
       request['deviceId'] = payload.deviceId;
-    } catch (error) {
-      if (error instanceof JsonWebTokenError) {
+    } catch (error)
+    {
+      if (error instanceof JsonWebTokenError)
+      {
         throw new HttpException(error.name, 401);
       }
       throw new UnauthorizedException();
     }
     return true;
   }
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
-  }
 }
 
 @Injectable()
-export class RoleGuard implements CanActivate {
+export class RoleGuard implements CanActivate
+{
   constructor(
     private readonly reflector: Reflector,
     private readonly permissionsService: PermissionsService,
-  ) {}
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  ) { }
+  async canActivate(context: ExecutionContext): Promise<boolean>
+  {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    if (isPublic) {
+    if (isPublic)
+    {
       // 💡 See this condition
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    if (request.user) {
+    if (request.user)
+    {
       const { method, params, path } = request;
-      const parsed = this.parseUrl(path, params);
+      const parsed = parseUrl(path, params);
       const allowed = await this.permissionsService.checkPermission(
         { path: parsed, method: method },
         request.user.role,
@@ -83,11 +108,47 @@ export class RoleGuard implements CanActivate {
     }
     return false;
   }
+}
 
-  private parseUrl(url: string, params: Record<string, string>) {
-    for (const [key, value] of Object.entries(params)) {
-      url = url.replace(value, `:${key}`);
+@Injectable()
+export class WsAuthGuard implements CanActivate
+{
+  constructor(
+    private readonly tokensService: TokensService,
+    private readonly usersService: UsersService,
+    private readonly reflector: Reflector,
+  ) { }
+  async canActivate(context: ExecutionContext): Promise<boolean>
+  {
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (isPublic)
+    {
+      // 💡 See this condition
+      return true;
     }
-    return url;
+    const client: Socket = context.switchToWs().getClient<Socket>();
+    const token: string = extractTokenFromHeader(client.handshake.headers.authorization);
+    if (!token) throw new UnauthorizedException();
+
+    try
+    {
+      const payload = await this.tokensService.verifyAsync(token);
+      if (!payload || !payload.userId) throw new UnauthorizedException();
+      const user = await this.usersService.findUserById(payload.userId);
+      if (!user) throw new UnauthorizedException();
+      client['user'] = user;
+      client['deviceId'] = payload.deviceId;
+    } catch (error)
+    {
+      if (error instanceof JsonWebTokenError)
+      {
+        throw new WsException(error.name);
+      }
+      throw new UnauthorizedException();
+    }
+    return true;
   }
 }

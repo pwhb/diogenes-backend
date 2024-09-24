@@ -15,7 +15,7 @@ export class ConfigsService {
     private readonly cacheService: CacheService,
   ) {}
   async get(code: string): Promise<any> {
-    return this.cacheService.get(code, () =>
+    return this.cacheService.get(`configs:${code}`, () =>
       this.configModel.findOne({ code }).lean(),
     );
   }

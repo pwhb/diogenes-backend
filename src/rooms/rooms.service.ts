@@ -4,15 +4,28 @@ import { UpdateRoomDto } from './dto/update-room.dto';
 import { Room, RoomType } from './rooms.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model, QueryOptions, Types } from 'mongoose';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
-export class RoomsService {
-  constructor(@InjectModel(Room.name) private roomModel: Model<Room>) {}
-  async create(dto: CreateRoomDto) {
+export class RoomsService
+{
+  constructor(
+    @InjectModel(Room.name) private roomModel: Model<Room>,
+    private readonly cacheService: CacheService,) { }
+  async create(dto: CreateRoomDto)
+  {
     return this.roomModel.create(dto);
   }
 
-  async createFriendChat({ participants }: { participants: Types.ObjectId[] }) {
+  async get(id: string): Promise<Room | null>
+  {
+    return this.cacheService.get(`rooms:${id}`, () =>
+      this.findOne(id),
+    );
+  }
+
+  async createFriendChat({ participants }: { participants: Types.ObjectId[]; })
+  {
     return this.roomModel
       .findOneAndUpdate(
         {
@@ -29,7 +42,8 @@ export class RoomsService {
       .lean();
   }
 
-  async getRoomList(id: Types.ObjectId) {
+  async getRoomList(id: Types.ObjectId)
+  {
     const filter = {
       participants: id,
     };
@@ -56,7 +70,8 @@ export class RoomsService {
     skip?: number;
     limit?: number;
     sort?: QueryOptions<Room>;
-  }) {
+  })
+  {
     const docs = await this.roomModel
       .find(filter, {}, { skip, limit, sort })
       .lean();
@@ -67,17 +82,20 @@ export class RoomsService {
     };
   }
 
-  findOne(id: string) {
+  findOne(id: string)
+  {
     return this.roomModel.findById(id).lean();
   }
 
-  update(id: string, dto: UpdateRoomDto) {
+  update(id: string, dto: UpdateRoomDto)
+  {
     return this.roomModel
       .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .lean();
   }
 
-  remove(id: string) {
+  remove(id: string)
+  {
     return this.roomModel.findByIdAndDelete(id).lean();
   }
 }
