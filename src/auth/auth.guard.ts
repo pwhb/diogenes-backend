@@ -14,9 +14,13 @@ import { JsonWebTokenError } from 'jsonwebtoken';
 import { UsersService } from 'src/users/users.service';
 import { Socket } from 'socket.io';
 import { WsException } from '@nestjs/websockets';
+import { ConfigsService } from 'src/configs/configs.service';
 
 const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
+
+const IS_BASIC_KEY = 'isBasic';
+export const Basic = () => SetMetadata(IS_BASIC_KEY, true);
 
 function extractTokenFromHeader(header: string): string | undefined {
   const [type, token] = header?.split(' ') ?? [];
@@ -29,6 +33,28 @@ function parseUrl(url: string, params: Record<string, string>) {
   }
   return url;
 }
+
+function checkCustomAuth(reflector: Reflector, context: ExecutionContext)
+{
+  const isPublic = reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    context.getHandler(),
+    context.getClass(),
+  ]);
+  if (isPublic) {
+    // 💡 See this condition
+    return true;
+  }
+  const isBasic = reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    context.getHandler(),
+    context.getClass(),
+  ]);
+  if (isBasic) {
+    // 💡 See this condition
+    return true;
+  }
+}
+
+
 
 @Injectable()
 export class AuthGuard implements CanActivate {
