@@ -14,7 +14,7 @@ export class TemplatesService {
     return this.templateModel.create(dto);
   }
 
-  async findAll({
+  async findMany({
     filter,
     skip,
     limit,

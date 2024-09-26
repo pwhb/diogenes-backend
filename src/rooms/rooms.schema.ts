@@ -5,14 +5,19 @@ import { User } from 'src/users/users.schema';
 
 export type RoomDocument = HydratedDocument<Room>;
 export enum RoomType {
-  GROUP = 'GROUP',
-  DIRECT = 'DIRECT',
-  GAME = 'GAME',
+  GROUP = 'group',
+  DIRECT = 'direct',
+  GAME = 'game',
+}
+
+export enum RoomVisibility {
+  PRIVATE = 'private',
+  PUBLIC = 'public',
 }
 @Schema({ timestamps: true })
 export class Room extends Base {
   @Prop({ type: Object })
-  metadata: {
+  metadata?: {
     icon?: string;
     name?: string;
   };
@@ -25,16 +30,16 @@ export class Room extends Base {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: User.name }],
   })
-  admins: Types.ObjectId[];
+  admins?: Types.ObjectId[];
 
   @Prop({ required: true })
   type: RoomType;
 
   @Prop({ required: true, default: 'private' })
-  visibility: string;
+  visibility?: RoomVisibility;
 
   @Prop({ required: true, default: 'inactive' })
-  status: string;
+  status?: string;
 }
 
 export const RoomSchema = SchemaFactory.createForClass(Room);

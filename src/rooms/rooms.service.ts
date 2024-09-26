@@ -7,25 +7,20 @@ import { FilterQuery, Model, QueryOptions, Types } from 'mongoose';
 import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
-export class RoomsService
-{
+export class RoomsService {
   constructor(
     @InjectModel(Room.name) private roomModel: Model<Room>,
-    private readonly cacheService: CacheService,) { }
-  async create(dto: CreateRoomDto)
-  {
+    private readonly cacheService: CacheService,
+  ) {}
+  async create(dto: Room) {
     return this.roomModel.create(dto);
   }
 
-  async get(id: string): Promise<Room | null>
-  {
-    return this.cacheService.get(`rooms:${id}`, () =>
-      this.findOne(id),
-    );
+  async get(id: string): Promise<Room | null> {
+    return this.cacheService.get(`rooms:${id}`, () => this.findOne(id));
   }
 
-  async createFriendChat({ participants }: { participants: Types.ObjectId[]; })
-  {
+  async createFriendChat({ participants }: { participants: Types.ObjectId[] }) {
     return this.roomModel
       .findOneAndUpdate(
         {
@@ -42,8 +37,7 @@ export class RoomsService
       .lean();
   }
 
-  async getRoomList(id: Types.ObjectId)
-  {
+  async getRoomList(id: Types.ObjectId) {
     const filter = {
       participants: id,
     };
@@ -60,7 +54,7 @@ export class RoomsService
     return { data, count };
   }
 
-  async findAll({
+  async findMany({
     filter,
     skip,
     limit,
@@ -70,8 +64,7 @@ export class RoomsService
     skip?: number;
     limit?: number;
     sort?: QueryOptions<Room>;
-  })
-  {
+  }) {
     const docs = await this.roomModel
       .find(filter, {}, { skip, limit, sort })
       .lean();
@@ -82,20 +75,17 @@ export class RoomsService
     };
   }
 
-  findOne(id: string)
-  {
+  findOne(id: string) {
     return this.roomModel.findById(id).lean();
   }
 
-  update(id: string, dto: UpdateRoomDto)
-  {
+  update(id: string, dto: UpdateRoomDto) {
     return this.roomModel
       .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
       .lean();
   }
 
-  remove(id: string)
-  {
+  remove(id: string) {
     return this.roomModel.findByIdAndDelete(id).lean();
   }
 }

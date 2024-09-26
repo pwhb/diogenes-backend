@@ -15,7 +15,9 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import STRINGS from 'src/common/consts/strings.json';
 import { parseQuery, QueryType } from 'src/common/db/query';
 import { Response } from 'express';
-@Controller('notifications')
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('notifications')
+@Controller('api/v1/notifications')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
   @Post()
@@ -28,7 +30,7 @@ export class NotificationsController {
   }
 
   @Get()
-  async findAll(@Query() query: any, @Res() res: Response) {
+  async findMany(@Query() query: any, @Res() res: Response) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -37,7 +39,7 @@ export class NotificationsController {
       },
     ]);
 
-    const { count, data } = await this.notificationsService.findAll({
+    const { count, data } = await this.notificationsService.findMany({
       filter,
       skip,
       limit,

@@ -31,7 +31,7 @@ export class UsersController {
   }
 
   @Get()
-  async findAll(@Query() query: QueryUserDto, @Res() res: Response) {
+  async findMany(@Query() query: QueryUserDto, @Res() res: Response) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -40,7 +40,7 @@ export class UsersController {
       },
     ]);
 
-    const { count, data } = await this.usersService.findAll({
+    const { count, data } = await this.usersService.findMany({
       filter,
       skip,
       limit,

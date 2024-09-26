@@ -20,17 +20,17 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('api/v1/rooms')
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
-  @Post()
-  async create(@Body() dto: CreateRoomDto, @Res() res: Response) {
-    const data = await this.roomsService.create(dto);
-    return res.status(200).json({
-      message: STRINGS.RESPONSES.SUCCESS,
-      data,
-    });
-  }
+  // @Post()
+  // async create(@Body() dto: CreateRoomDto, @Res() res: Response) {
+  //   const data = await this.roomsService.create(dto);
+  //   return res.status(200).json({
+  //     message: STRINGS.RESPONSES.SUCCESS,
+  //     data,
+  //   });
+  // }
 
   @Get()
-  async findAll(@Query() query: any, @Res() res: Response) {
+  async findMany(@Query() query: any, @Res() res: Response) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -39,7 +39,7 @@ export class RoomsController {
       },
     ]);
 
-    const { count, data } = await this.roomsService.findAll({
+    const { count, data } = await this.roomsService.findMany({
       filter,
       skip,
       limit,

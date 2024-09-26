@@ -35,7 +35,7 @@ export class UsersService {
     );
   }
 
-  async findAll({
+  async findMany({
     filter,
     skip,
     limit,

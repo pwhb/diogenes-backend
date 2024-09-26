@@ -38,7 +38,7 @@ export class PermissionsController {
   }
 
   @Get()
-  async findAll(@Query() query: QueryPermissionDto, @Res() res: Response) {
+  async findMany(@Query() query: QueryPermissionDto, @Res() res: Response) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -47,7 +47,7 @@ export class PermissionsController {
       },
     ]);
 
-    const { count, data } = await this.permissionsService.findAll({
+    const { count, data } = await this.permissionsService.findMany({
       filter,
       skip,
       limit,

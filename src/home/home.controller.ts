@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+} from '@nestjs/common';
 // import { HomeService } from './home.service';
 import { ApiTags } from '@nestjs/swagger';
 import { TemplateType } from 'src/templates/templates.schema';
@@ -9,6 +18,8 @@ import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { ConnectionsService } from 'src/connections/connections.service';
 import { RoomsService } from 'src/rooms/rooms.service';
+import { RoomType } from 'src/rooms/rooms.schema';
+import { CreateGroupDto } from './dto/create-group.dto';
 @ApiTags('home')
 @Controller('api/v1/home')
 export class HomeController {
@@ -21,7 +32,7 @@ export class HomeController {
 
   @Get('games')
   async getGames() {
-    const { count, data } = await this.templatesService.findAll({
+    const { count, data } = await this.templatesService.findMany({
       filter: {
         type: TemplateType.GAME,
         status: 'active',
@@ -37,16 +48,50 @@ export class HomeController {
   @Get('friends')
   async getFriendList(
     @Req() req: Request,
-    // @Query() query: any,
+    @Query() query: any,
     @Res() res: Response,
   ) {
     const reqUserId = new Types.ObjectId(req['user']['_id'] as string);
-    const { data, count } =
-      await this.connectionsService.getFriendList(reqUserId);
-
+    let data: any;
+    if (query.status === 'sent') {
+      const sent = await this.connectionsService.findMany({
+        filter: {
+          user1: reqUserId,
+          status: 'pending',
+        },
+      });
+      data = {
+        status: 'sent',
+        count: sent.count,
+        data: sent.data.map((v) => v.user2),
+      };
+    } else if (query.status === 'received') {
+      const received = await this.connectionsService.findMany({
+        filter: {
+          user2: reqUserId,
+          status: 'pending',
+        },
+      });
+      data = {
+        status: 'received',
+        count: received.count,
+        data: received.data.map((v) => v.user1),
+      };
+    } else {
+      const friends = await this.connectionsService.findMany({
+        filter: {
+          $or: [{ user1: reqUserId }, { user2: reqUserId }],
+          status: 'friends',
+        },
+      });
+      data = {
+        status: 'friends',
+        count: friends.count,
+        data: this.connectionsService.getFriendList(reqUserId, friends.data),
+      };
+    }
     return res.status(200).json({
       message: STRINGS.RESPONSES.SUCCESS,
-      count,
       data: data,
     });
   }
@@ -64,6 +109,42 @@ export class HomeController {
       message: STRINGS.RESPONSES.SUCCESS,
       count,
       data: data,
+    });
+  }
+
+  @Post('rooms')
+  async createGroup(
+    @Req() req: Request,
+    @Body() dto: CreateGroupDto,
+    @Res() res: Response,
+  ) {
+    const reqUserId = req['user']['_id'];
+    const friendIds = dto.friendIds;
+    const { data } = await this.connectionsService.findMany({
+      filter: {
+        $or: [{ user1: reqUserId }, { user2: reqUserId }],
+        status: 'friends',
+      },
+    });
+    const friends = this.connectionsService.getFriendList(reqUserId, data);
+    const participants = [reqUserId, ...friendIds].filter((id) =>
+      friends.some((friend) => friend._id.toString() === id.toString()),
+    );
+
+    const created = await this.roomsService.create({
+      participants: participants,
+      type: RoomType.GROUP,
+      admins: [reqUserId],
+      metadata: {
+        name: dto.name,
+        icon: dto.icon,
+      },
+      visibility: dto.visibility,
+      status: 'active',
+    });
+    return res.status(200).json({
+      message: STRINGS.RESPONSES.SUCCESS,
+      data: created,
     });
   }
 
@@ -119,6 +200,24 @@ export class HomeController {
   ) {
     const reqUserId = new Types.ObjectId(req['user']['_id'] as string);
     const friendId = new Types.ObjectId(body.friendId as string);
+    if (reqUserId.toString() === friendId.toString()) {
+      return res.status(400).json({
+        message: STRINGS.RESPONSES.SAME_USER,
+      });
+    }
+    const alreadyExists = await this.connectionsService.findOne({
+      $or: [
+        { user1: reqUserId, user2: friendId },
+        { user1: friendId, user2: reqUserId },
+      ],
+    });
+
+    if (alreadyExists) {
+      return res.status(400).json({
+        message: STRINGS.RESPONSES.ALREADY_ADDED,
+      });
+    }
+
     const data = await this.connectionsService.create({
       user1: reqUserId,
       user2: friendId,

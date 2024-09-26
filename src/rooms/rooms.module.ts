@@ -14,7 +14,6 @@ import { CacheService } from 'src/cache/cache.service';
     MongooseModule.forFeature([{ name: Room.name, schema: RoomSchema }]),
     TokensModule,
     UsersModule,
-    
   ],
   controllers: [RoomsController],
   providers: [RoomsService, MessagesService, RoomsGateway, CacheService],

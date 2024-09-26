@@ -15,7 +15,7 @@ export class NotificationsService {
     return this.notificationModel.create(dto);
   }
 
-  async findAll({
+  async findMany({
     filter,
     skip,
     limit,

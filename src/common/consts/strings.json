@@ -16,6 +16,8 @@
     "JWT_MALFORMED": "jwt malformed",
     "TOKENEXPIREDERROR": "TokenExpiredError",
     "JSONWEBTOKENERROR": "JsonWebTokenError",
-    "USER_LOGGED_OUT": "User logged out successfully."
+    "USER_LOGGED_OUT": "User logged out successfully.",
+    "ALREADY_ADDED": "Already added.",
+    "SAME_USER": "Same user."
   }
 }

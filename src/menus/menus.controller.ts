@@ -15,7 +15,9 @@ import { UpdateMenuDto } from './dto/update-menu.dto';
 import STRINGS from 'src/common/consts/strings.json';
 import { parseQuery, QueryType } from 'src/common/db/query';
 import { Response } from 'express';
-@Controller('menus')
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('menus')
+@Controller('api/v1/menus')
 export class MenusController {
   constructor(private readonly menusService: MenusService) {}
 
@@ -29,7 +31,7 @@ export class MenusController {
   }
 
   @Get()
-  async findAll(@Query() query: any, @Res() res: Response) {
+  async findMany(@Query() query: any, @Res() res: Response) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -38,7 +40,7 @@ export class MenusController {
       },
     ]);
 
-    const { count, data } = await this.menusService.findAll({
+    const { count, data } = await this.menusService.findMany({
       filter,
       skip,
       limit,

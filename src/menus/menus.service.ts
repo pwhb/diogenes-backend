@@ -15,7 +15,7 @@ export class MenusService {
     return this.menuModel.create(dto);
   }
 
-  async findAll({
+  async findMany({
     filter,
     skip,
     limit,

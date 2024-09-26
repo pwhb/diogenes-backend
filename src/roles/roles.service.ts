@@ -12,7 +12,7 @@ export class RolesService {
     return this.roleModel.create(dto);
   }
 
-  async findAll({
+  async findMany({
     filter,
     skip,
     limit,

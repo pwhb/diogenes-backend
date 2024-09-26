@@ -33,7 +33,7 @@ export class RolesController {
   }
 
   @Get()
-  async findAll(@Query() query: QueryRoleDto, @Res() res: Response) {
+  async findMany(@Query() query: QueryRoleDto, @Res() res: Response) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -42,7 +42,7 @@ export class RolesController {
       },
     ]);
 
-    const { count, data } = await this.rolesService.findAll({
+    const { count, data } = await this.rolesService.findMany({
       filter,
       skip,
       limit,

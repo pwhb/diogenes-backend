@@ -31,7 +31,7 @@ export class ConfigsController {
   }
 
   @Get()
-  async findAll(@Query() query: QueryConfigDto, @Res() res: Response) {
+  async findMany(@Query() query: QueryConfigDto, @Res() res: Response) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -40,7 +40,7 @@ export class ConfigsController {
       },
     ]);
 
-    const { count, data } = await this.configsService.findAll({
+    const { count, data } = await this.configsService.findMany({
       filter,
       skip,
       limit,

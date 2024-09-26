@@ -58,7 +58,7 @@ export class PermissionsService {
     return false;
   }
 
-  async findAll({
+  async findMany({
     filter,
     skip,
     limit,

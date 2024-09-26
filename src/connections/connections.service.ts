@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Connection } from './connections.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Types } from 'mongoose';
+import { FilterQuery, Model, QueryOptions, Types } from 'mongoose';
 
 @Injectable()
 export class ConnectionsService {
@@ -29,19 +29,19 @@ export class ConnectionsService {
     return this.connectionModel.findOne(filter).lean();
   }
 
-  update(id: string | Types.ObjectId, dto: { status: string }) {
-    return this.connectionModel
-      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
-      .lean();
-  }
-
-  async getFriendList(id: Types.ObjectId) {
-    const filter = {
-      $or: [{ user1: id }, { user2: id }],
-      status: 'friends',
-    };
-    const data = await this.connectionModel
-      .find(filter)
+  async findMany({
+    filter,
+    skip,
+    limit,
+    sort,
+  }: {
+    filter: FilterQuery<Connection>;
+    skip?: number;
+    limit?: number;
+    sort?: QueryOptions<Connection>;
+  }) {
+    const docs = await this.connectionModel
+      .find(filter, {}, { skip, limit, sort })
       .populate([
         {
           path: 'user1',
@@ -54,6 +54,21 @@ export class ConnectionsService {
       ])
       .lean();
     const count = await this.connectionModel.countDocuments(filter);
-    return { data, count };
+    return {
+      count,
+      data: docs,
+    };
+  }
+
+  getFriendList(reqUserId: Types.ObjectId, list: Connection[]) {
+    return list.map((v) =>
+      v.user1._id.toString() === reqUserId.toString() ? v.user2 : v.user1,
+    );
+  }
+
+  update(id: string | Types.ObjectId, dto: { status: string }) {
+    return this.connectionModel
+      .findByIdAndUpdate(id, dto, { returnDocument: 'after' })
+      .lean();
   }
 }

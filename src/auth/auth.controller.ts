@@ -10,7 +10,8 @@ import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { TokensService } from 'src/tokens/tokens.service';
 import { Public } from './auth.guard';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('auth')
 @Controller('api/v1/auth')
 export class AuthController {
   constructor(

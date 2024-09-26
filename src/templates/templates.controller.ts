@@ -17,7 +17,8 @@ import { QueryTemplateDto } from './dto/query-role.dto';
 import { Request, Response } from 'express';
 import STRINGS from 'src/common/consts/strings.json';
 import { parseQuery, QueryType } from 'src/common/db/query';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('templates')
 @Controller('api/v1/templates')
 export class TemplatesController {
   constructor(private readonly templatesService: TemplatesService) {}
@@ -36,7 +37,7 @@ export class TemplatesController {
   }
 
   @Get()
-  async findAll(@Query() query: QueryTemplateDto, @Res() res: Response) {
+  async findMany(@Query() query: QueryTemplateDto, @Res() res: Response) {
     const { skip, limit, page, sort, filter } = parseQuery(query, [
       {
         key: 'q',
@@ -45,7 +46,7 @@ export class TemplatesController {
       },
     ]);
 
-    const { count, data } = await this.templatesService.findAll({
+    const { count, data } = await this.templatesService.findMany({
       filter,
       skip,
       limit,
