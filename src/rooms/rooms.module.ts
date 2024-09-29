@@ -5,9 +5,9 @@ import { Room, RoomSchema } from './rooms.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MessagesService } from './messages/messages.service';
 import { RoomsGateway } from './rooms.gateway';
-import { TokensModule } from 'src/tokens/tokens.module';
 import { UsersModule } from 'src/users/users.module';
 import { CacheService } from 'src/cache/cache.service';
+import { TokensModule } from 'src/auth/tokens/tokens.module';
 
 @Module({
   imports: [

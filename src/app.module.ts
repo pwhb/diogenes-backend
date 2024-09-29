@@ -22,7 +22,7 @@ import { ConnectionsModule } from './connections/connections.module';
 import { CacheService } from './cache/cache.service';
 import { NotificationsModule } from './notifications/notifications.module';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { OtpModule } from './otp/otp.module';
+import { OtpModule } from './auth/otp/otp.module';
 
 @Module({
   imports: [

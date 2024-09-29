@@ -5,8 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Auth, AuthSchema } from './auth.schema';
 import { UsersModule } from 'src/users/users.module';
 import { ConfigsModule } from 'src/configs/configs.module';
-import { TokensModule } from 'src/tokens/tokens.module';
 import { OtpModule } from './otp/otp.module';
+import { TokensModule } from './tokens/tokens.module';
 
 @Module({
   imports: [
