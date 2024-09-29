@@ -12,6 +12,9 @@ export class Token extends Base {
   @Prop()
   token: string;
 
+  @Prop({ default: 'web' })
+  client: string;
+
   @Prop({ type: Types.ObjectId, ref: User.name })
   userId: Types.ObjectId;
 

@@ -11,7 +11,7 @@ import { RolesModule } from './roles/roles.module';
 import { ConfigsModule } from './configs/configs.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { MenusModule } from './menus/menus.module';
-import { TokensModule } from './tokens/tokens.module';
+import { TokensModule } from './auth/tokens/tokens.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { TemplatesModule } from './templates/templates.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -21,6 +21,8 @@ import { RoomsModule } from './rooms/rooms.module';
 import { ConnectionsModule } from './connections/connections.module';
 import { CacheService } from './cache/cache.service';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -38,6 +40,19 @@ import { NotificationsModule } from './notifications/notifications.module';
       }),
       inject: [ConfigService],
     }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          service: 'gmail',
+          auth: {
+            user: configService.get('MAIL_USER'),
+            pass: configService.get('MAIL_PASSWORD'),
+          },
+        },
+      }),
+      inject: [ConfigService],
+    }),
     AuthModule,
     UsersModule,
     RolesModule,
@@ -50,6 +65,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     RoomsModule,
     ConnectionsModule,
     NotificationsModule,
+    OtpModule,
   ],
   controllers: [AppController],
   providers: [

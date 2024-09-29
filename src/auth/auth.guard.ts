@@ -5,8 +5,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { TokensService } from 'src/tokens/tokens.service';
+import { TokensService } from 'src/auth/tokens/tokens.service';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PermissionsService } from 'src/permissions/permissions.service';
@@ -19,12 +18,12 @@ import { ConfigsService } from 'src/configs/configs.service';
 const IS_PUBLIC_KEY = 'isPublic';
 export const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
-const IS_BASIC_KEY = 'isBasic';
-export const Basic = () => SetMetadata(IS_BASIC_KEY, true);
-
-function extractTokenFromHeader(header: string): string | undefined {
+function extractTokenFromHeader(header: string): {
+  type: string;
+  token: string;
+} {
   const [type, token] = header?.split(' ') ?? [];
-  return type === 'Bearer' ? token : undefined;
+  return { type, token };
 }
 
 function parseUrl(url: string, params: Record<string, string>) {
@@ -33,28 +32,6 @@ function parseUrl(url: string, params: Record<string, string>) {
   }
   return url;
 }
-
-function checkCustomAuth(reflector: Reflector, context: ExecutionContext)
-{
-  const isPublic = reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-    context.getHandler(),
-    context.getClass(),
-  ]);
-  if (isPublic) {
-    // 💡 See this condition
-    return true;
-  }
-  const isBasic = reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-    context.getHandler(),
-    context.getClass(),
-  ]);
-  if (isBasic) {
-    // 💡 See this condition
-    return true;
-  }
-}
-
-
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -73,8 +50,10 @@ export class AuthGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest();
-    const token = extractTokenFromHeader(request.headers.authorization);
-    if (!token) throw new UnauthorizedException();
+    const { token, type } = extractTokenFromHeader(
+      request.headers.authorization,
+    );
+    if (!token || type !== 'Bearer') throw new UnauthorizedException();
 
     try {
       const payload = await this.tokensService.verifyAsync(token);
@@ -83,6 +62,7 @@ export class AuthGuard implements CanActivate {
       if (!user) throw new UnauthorizedException();
       request['user'] = user;
       request['deviceId'] = payload.deviceId;
+      request['client'] = payload.client;
     } catch (error) {
       if (error instanceof JsonWebTokenError) {
         throw new HttpException(error.name, 401);
@@ -139,10 +119,10 @@ export class WsAuthGuard implements CanActivate {
       return true;
     }
     const client: Socket = context.switchToWs().getClient<Socket>();
-    const token: string = extractTokenFromHeader(
+    const { token, type } = extractTokenFromHeader(
       client.handshake.headers.authorization,
     );
-    if (!token) throw new UnauthorizedException();
+    if (!token || type !== 'Bearer') throw new UnauthorizedException();
 
     try {
       const payload = await this.tokensService.verifyAsync(token);
@@ -154,6 +134,37 @@ export class WsAuthGuard implements CanActivate {
     } catch (error) {
       if (error instanceof JsonWebTokenError) {
         throw new WsException(error.name);
+      }
+      throw new UnauthorizedException();
+    }
+    return true;
+  }
+}
+
+@Injectable()
+export class BasicAuthGuard implements CanActivate {
+  constructor(private readonly configsService: ConfigsService) {}
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const { token, type } = extractTokenFromHeader(
+      request.headers.authorization,
+    );
+    if (!token || type !== 'Basic') throw new UnauthorizedException();
+    try {
+      const credentials = Buffer.from(token, 'base64').toString();
+      const [username, password] = credentials.split(':');
+      const CLIENT = await this.configsService.get('CLIENT');
+      if (
+        CLIENT.value[username] &&
+        CLIENT.value[username]['password'] === password
+      ) {
+        request['client'] = CLIENT.value[username]['client'];
+        return true;
+      }
+      return false;
+    } catch (error) {
+      if (error instanceof JsonWebTokenError) {
+        throw new HttpException(error.name, 401);
       }
       throw new UnauthorizedException();
     }

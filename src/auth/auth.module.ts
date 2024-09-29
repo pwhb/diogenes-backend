@@ -6,6 +6,7 @@ import { Auth, AuthSchema } from './auth.schema';
 import { UsersModule } from 'src/users/users.module';
 import { ConfigsModule } from 'src/configs/configs.module';
 import { TokensModule } from 'src/tokens/tokens.module';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TokensModule } from 'src/tokens/tokens.module';
     ConfigsModule,
     UsersModule,
     TokensModule,
+    OtpModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

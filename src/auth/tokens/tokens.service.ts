@@ -18,13 +18,19 @@ export class TokensService {
     private readonly configsService: ConfigsService,
   ) {}
 
-  async signin(userId: Types.ObjectId, loginAuthDto: LoginAuthDto) {
+  async signin(
+    client: string,
+    userId: Types.ObjectId,
+    loginAuthDto: LoginAuthDto,
+  ) {
     const refreshToken = await this.generateRefreshToken(
+      client,
       userId,
       loginAuthDto.deviceId,
       loginAuthDto.rememberMe,
     );
     const accessToken = await this.generateAccessToken({
+      client: client,
       userId: userId.toString(),
       deviceId: loginAuthDto.deviceId,
     });
@@ -35,11 +41,16 @@ export class TokensService {
     return await this.jwtService.verifyAsync(token);
   }
 
-  async generateAccessToken(payload: { userId: string; deviceId: string }) {
+  async generateAccessToken(payload: {
+    client: string;
+    userId: string;
+    deviceId: string;
+  }) {
     return await this.jwtService.signAsync(payload);
   }
 
   async generateRefreshToken(
+    client: string,
     userId: Types.ObjectId,
     deviceId: string,
     rememberMe: boolean = false,
@@ -49,8 +60,6 @@ export class TokensService {
       ? AUTH.value['LongRefreshTokenExpirationInDay']
       : AUTH.value['RefreshTokenExpirationInDay'];
 
-    console.log('duration', duration);
-
     return await this.tokenModel
       .findOneAndUpdate(
         { userId: userId, deviceId: deviceId },
@@ -58,13 +67,14 @@ export class TokensService {
           token: uuidv4(),
           expiredAt: dayjs().add(duration, 'day'),
           rememberMe,
+          client: client,
         },
         { upsert: true, returnDocument: 'after' },
       )
       .lean();
   }
 
-  async refreshToken(token: string, deviceId: string) {
+  async refreshToken(client: string, token: string, deviceId: string) {
     const prevToken = await this.tokenModel
       .findOne({
         token,
@@ -73,11 +83,13 @@ export class TokensService {
       .lean();
     if (prevToken && dayjs().isBefore(prevToken.expiredAt)) {
       const refreshToken = await this.generateRefreshToken(
+        client,
         prevToken.userId,
         deviceId,
         prevToken.rememberMe,
       );
       const accessToken = await this.generateAccessToken({
+        client: client,
         userId: prevToken.userId.toString(),
         deviceId: deviceId,
       });

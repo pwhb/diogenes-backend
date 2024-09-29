@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Res, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Res,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { QuickRegisterAuthDto } from './dto/quick-register-auth.dto';
 import { UsersService } from 'src/users/users.service';
@@ -8,8 +16,8 @@ import STRINGS from 'src/common/consts/strings.json';
 import { Request, Response } from 'express';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
-import { TokensService } from 'src/tokens/tokens.service';
-import { Public } from './auth.guard';
+import { TokensService } from 'src/auth/tokens/tokens.service';
+import { BasicAuthGuard, Public } from './auth.guard';
 import { ApiTags } from '@nestjs/swagger';
 @ApiTags('auth')
 @Controller('api/v1/auth')
@@ -34,6 +42,7 @@ export class AuthController {
   }
 
   @Public()
+  @UseGuards(BasicAuthGuard)
   @Post('quick-register')
   async quickRegister(@Body() dto: QuickRegisterAuthDto, @Res() res: Response) {
     const USER_ROLE = await this.configsService.get('USER_ROLE');
@@ -73,6 +82,7 @@ export class AuthController {
   }
 
   @Public()
+  @UseGuards(BasicAuthGuard)
   @Post('register')
   async register(@Body() dto: RegisterAuthDto, @Res() res: Response) {
     const USER_ROLE = await this.configsService.get('USER_ROLE');
@@ -109,8 +119,13 @@ export class AuthController {
   }
 
   @Public()
+  @UseGuards(BasicAuthGuard)
   @Post('login')
-  async login(@Body() dto: LoginAuthDto, @Res() res: Response) {
+  async login(
+    @Body() dto: LoginAuthDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
     const user = await this.usersService.findUser({ username: dto.username });
     if (!user || user.status !== 'active') {
       return res.status(404).json({
@@ -127,6 +142,7 @@ export class AuthController {
       });
     }
     const { refresh_token, access_token } = await this.tokensService.signin(
+      req['client'],
       user._id,
       dto,
     );
