@@ -16,6 +16,7 @@ import { ConfigsModule } from 'src/configs/configs.module';
         const secret = configService.get('SECRET_KEY');
         return {
           secret: secret,
+          signOptions: { expiresIn: '60s' },
         };
       },
     }),

@@ -17,6 +17,12 @@ export class User extends Base {
   roleId: string;
 
   @Prop({})
+  email?: string;
+
+  @Prop({ default: false })
+  isEmailVerified?: boolean;
+
+  @Prop({})
   bio?: string;
 
   @Prop({})
