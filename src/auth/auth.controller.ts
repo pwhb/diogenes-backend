@@ -19,6 +19,7 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 import { TokensService } from 'src/auth/tokens/tokens.service';
 import { BasicAuthGuard, Public } from './auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 @ApiTags('auth')
 @Controller('api/v1/auth')
 export class AuthController {
@@ -125,7 +126,7 @@ export class AuthController {
     @Body() dto: LoginAuthDto,
     @Req() req: Request,
     @Res() res: Response,
-  ) {
+  ): Promise<any> {
     const user = await this.usersService.findUser({ username: dto.username });
     if (!user || user.status !== 'active') {
       return res.status(404).json({
@@ -150,6 +151,31 @@ export class AuthController {
       message: STRINGS.RESPONSES.SUCCESS,
       data: {
         user: user,
+        token: {
+          refresh_token,
+          access_token,
+        },
+      },
+    });
+  }
+
+  @Public()
+  @UseGuards(BasicAuthGuard)
+  @Post('refreshToken')
+  async refreshToken(
+    @Body() dto: RefreshTokenDto,
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const { refresh_token, access_token } =
+      await this.tokensService.refreshToken(
+        req['client'],
+        dto.refresh_token,
+        dto.deviceId,
+      );
+    return res.status(200).json({
+      message: STRINGS.RESPONSES.SUCCESS,
+      data: {
         token: {
           refresh_token,
           access_token,
